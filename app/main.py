@@ -1,4 +1,4 @@
-"""Ace Vault — Shared Co-Parenting Board (Tier 1)."""
+"""Co-Parenting Board."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.config import CF_TEAM_DOMAIN, HOST, PORT
+from app.config import APP_VERSION, CF_TEAM_DOMAIN, HOST, PORT
 from app.database import get_db, init_db
 from app.auth import get_optional_user
 from app.scheduler import start_scheduler, stop_scheduler
@@ -81,6 +81,7 @@ async def login_page(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("login.html", {
         "request": request,
         "cf_team_domain": CF_TEAM_DOMAIN,
+        "app_version": APP_VERSION,
     })
 
 
@@ -100,6 +101,7 @@ async def topics_page(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("issues.html", {
         "request": request,
         "user": user,
+        "app_version": APP_VERSION,
     })
 
 
@@ -112,6 +114,7 @@ async def topic_detail_page(request: Request, issue_id: str, db: AsyncSession = 
         "request": request,
         "user": user,
         "issue_id": issue_id,
+        "app_version": APP_VERSION,
     })
 
 
