@@ -4,7 +4,7 @@ A shared space for staying organized on everything going on with Ace. Each topic
 
 ## How to Sign In
 
-There are no passwords. When you visit the site, you'll be asked to verify your email address — it sends a one-time code to your inbox (similar to how a bank verifies your identity). Enter the code and you're signed in for 30 days. Both of your email addresses work and are linked to the same account.
+There are no passwords. When you visit the site, you'll be asked to verify your email address — it sends a one-time code to your inbox (similar to how a bank verifies your identity). Enter the code and you're signed in for 30 days. You can also use Google to authenticate. Email addresses have been setup ahead of time and linked to each parents' account.
 
 ## Features
 
