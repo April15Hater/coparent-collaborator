@@ -2,8 +2,6 @@
 
 A shared space for staying organized on everything going on with Ace. Each topic gets its own thread so nothing gets lost, and both parents can respond on their own time.
 
-**Live at:** [coparent.joeysolomon.com](https://coparent.joeysolomon.com)
-
 ## How to Sign In
 
 There are no passwords. When you visit the site, you'll be asked to verify your email address — it sends a one-time code to your inbox (similar to how a bank verifies your identity). Enter the code and you're signed in for 30 days. Both of your email addresses work and are linked to the same account.
