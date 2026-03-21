@@ -8,12 +8,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from audit import compute_hash, create_audit_entry, get_last_comment_hash, verify_comment_chain
-from auth import get_current_user
-from database import get_db
-from models import Comment, Issue, User
-from notifications import notify_new_comment
-from schemas import CommentCreate, CommentResponse, UserResponse
+from app.audit import compute_hash, create_audit_entry, get_last_comment_hash, verify_comment_chain
+from app.auth import get_current_user
+from app.database import get_db
+from app.models import Comment, Issue, User
+from app.notifications import notify_new_comment
+from app.schemas import CommentCreate, CommentResponse, UserResponse
 
 router = APIRouter(prefix="/api/issues/{issue_id}/comments", tags=["comments"])
 

@@ -17,8 +17,8 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from config import APP_URL, SMTP_FROM, SMTP_HOST, SMTP_PORT
-from models import (
+from app.config import APP_URL, SMTP_FROM, SMTP_HOST, SMTP_PORT
+from app.models import (
     Comment, Issue, NotificationLog, NotificationPrefs,
     TopicMute, User,
 )
@@ -146,7 +146,7 @@ async def notify_status_change(
     result = await db.execute(select(User).where(User.id != changer.id))
     recipients = result.scalars().all()
 
-    from schemas import friendly_status
+    from app.schemas import friendly_status
 
     for recipient in recipients:
         prefs = await _get_prefs(db, recipient.id)

@@ -7,12 +7,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).parent / ".env")
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 log = logging.getLogger(__name__)
 
 # Database — SQLite on CT131
-_DATA_DIR = Path(__file__).parent / "data"
+_DATA_DIR = Path(__file__).parent.parent / "data"
 _DATA_DIR.mkdir(exist_ok=True)
 DATABASE_PATH: str = os.getenv("DATABASE_PATH", str(_DATA_DIR / "shared.db"))
 DATABASE_URL: str = f"sqlite+aiosqlite:///{DATABASE_PATH}"

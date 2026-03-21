@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from audit import create_audit_entry
-from auth import get_current_user, require_parent_a
-from database import get_db
-from models import User, UserEmail
+from app.audit import create_audit_entry
+from app.auth import get_current_user, require_parent_a
+from app.database import get_db
+from app.models import User, UserEmail
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

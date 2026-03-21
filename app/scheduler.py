@@ -6,8 +6,8 @@ from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from config import TIMEZONE
-from database import async_session
+from app.config import TIMEZONE
+from app.database import async_session
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ scheduler = AsyncIOScheduler()
 
 async def _run_due_date_reminders():
     """Check for upcoming due dates and send reminders."""
-    from notifications import send_due_date_reminders
+    from app.notifications import send_due_date_reminders
 
     log.info("Running due date reminder check")
     async with async_session() as db:
@@ -29,7 +29,7 @@ async def _run_due_date_reminders():
 async def _run_daily_digest():
     """Send daily digest emails."""
     from zoneinfo import ZoneInfo
-    from notifications import send_daily_digest
+    from app.notifications import send_daily_digest
 
     now = datetime.now(ZoneInfo(TIMEZONE))
     hour_str = f"{now.hour:02d}:00"
@@ -44,7 +44,7 @@ async def _run_daily_digest():
 async def _clear_practice_topic():
     """Auto-clear comments from the practice topic every 10 minutes."""
     from sqlalchemy import delete, select
-    from models import Issue, Comment, IssueStatusLog
+    from app.models import Issue, Comment, IssueStatusLog
 
     async with async_session() as db:
         try:

@@ -10,10 +10,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from auth import get_current_user
-from database import get_db
-from models import Comment, Issue, IssueStatusLog, User
-from schemas import friendly_status
+from app.auth import get_current_user
+from app.database import get_db
+from app.models import Comment, Issue, IssueStatusLog, User
+from app.schemas import friendly_status
 
 router = APIRouter(prefix="/export", tags=["export"])
 

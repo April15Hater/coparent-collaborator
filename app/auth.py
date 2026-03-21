@@ -17,9 +17,9 @@ from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import CF_AUD, CF_TEAM_DOMAIN, DEV_USER_EMAIL
-from database import get_db
-from models import User, UserEmail
+from app.config import CF_AUD, CF_TEAM_DOMAIN, DEV_USER_EMAIL
+from app.database import get_db
+from app.models import User, UserEmail
 
 log = logging.getLogger(__name__)
 

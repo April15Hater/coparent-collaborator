@@ -8,13 +8,13 @@ from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from audit import create_audit_entry
+from app.audit import create_audit_entry
 from sqlalchemy import delete
-from auth import get_current_user, require_parent_a
-from database import get_db
-from models import Comment, Issue, IssueStatusLog, Tag, User
-from notifications import notify_status_change
-from schemas import (
+from app.auth import get_current_user, require_parent_a
+from app.database import get_db
+from app.models import Comment, Issue, IssueStatusLog, Tag, User
+from app.notifications import notify_status_change
+from app.schemas import (
     IssueCreate,
     IssueResponse,
     IssueUpdate,

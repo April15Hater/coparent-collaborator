@@ -4,7 +4,7 @@ import logging
 
 import anthropic
 
-from config import ANTHROPIC_API_KEY, AI_MODEL
+from app.config import ANTHROPIC_API_KEY, AI_MODEL
 
 log = logging.getLogger(__name__)
 

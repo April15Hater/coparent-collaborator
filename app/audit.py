@@ -8,7 +8,7 @@ from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import AuditLog, Comment
+from app.models import AuditLog, Comment
 
 
 def compute_hash(prev_hash: Optional[str], content: str, timestamp: datetime) -> str:

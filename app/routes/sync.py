@@ -10,9 +10,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from config import SYNC_API_KEY
-from database import get_db
-from models import Comment, Issue, IssueStatusLog
+from app.config import SYNC_API_KEY
+from app.database import get_db
+from app.models import Comment, Issue, IssueStatusLog
 
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 

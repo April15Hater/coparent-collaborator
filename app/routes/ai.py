@@ -11,11 +11,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ai_rewrite import TONE_PROMPTS, check_appropriateness, rewrite_comment, summarize_thread
-from auth import get_current_user
-from config import ANTHROPIC_API_KEY
-from database import get_db
-from models import Comment, Issue, User
+from app.ai_rewrite import TONE_PROMPTS, check_appropriateness, rewrite_comment, summarize_thread
+from app.auth import get_current_user
+from app.config import ANTHROPIC_API_KEY
+from app.database import get_db
+from app.models import Comment, Issue, User
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 

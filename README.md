@@ -72,7 +72,7 @@ Self-hosted FastAPI application with SQLite database. Authentication via Cloudfl
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env  # fill in required values
-python main.py
+uvicorn app.main:app --reload
 ```
 
 ### Environment Variables

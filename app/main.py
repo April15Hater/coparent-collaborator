@@ -10,10 +10,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from config import CF_TEAM_DOMAIN, HOST, PORT
-from database import get_db, init_db
-from auth import get_optional_user
-from scheduler import start_scheduler, stop_scheduler
+from app.config import CF_TEAM_DOMAIN, HOST, PORT
+from app.database import get_db, init_db
+from app.auth import get_optional_user
+from app.scheduler import start_scheduler, stop_scheduler
 from sqlalchemy.ext.asyncio import AsyncSession
 
 _BASE_DIR = Path(__file__).parent
@@ -45,14 +45,14 @@ templates = Jinja2Templates(directory=str(_BASE_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(_BASE_DIR / "static")), name="static")
 
 # API routers
-from routes_auth import router as auth_router
-from routes_issues import router as issues_router
-from routes_comments import router as comments_router
-from routes_sync import router as sync_router
-from routes_invite import router as invite_router
-from routes_notifications import router as notifications_router
-from routes_ai_rewrite import router as ai_rewrite_router
-from routes_export import router as export_router
+from app.routes.auth import router as auth_router
+from app.routes.issues import router as issues_router
+from app.routes.comments import router as comments_router
+from app.routes.sync import router as sync_router
+from app.routes.invite import router as invite_router
+from app.routes.notifications import router as notifications_router
+from app.routes.ai import router as ai_rewrite_router
+from app.routes.export import router as export_router
 
 app.include_router(auth_router)
 app.include_router(issues_router)
@@ -116,4 +116,4 @@ async def topic_detail_page(request: Request, issue_id: str, db: AsyncSession = 
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("app.main:app", host=HOST, port=PORT, reload=True)
