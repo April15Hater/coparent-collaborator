@@ -1,5 +1,7 @@
 """AI rewrite endpoint — adjust tone of a comment before posting."""
 
+import time
+from collections import defaultdict
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -17,6 +19,28 @@ from models import Comment, Issue, User
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
+# ── In-memory rate limiter (30 AI calls per user per hour) ───────────────────
+_AI_RATE_LIMIT = 30
+_AI_RATE_WINDOW = 3600  # seconds
+_ai_call_log: dict[str, list[float]] = defaultdict(list)
+
+
+def _check_ai_rate_limit(user: User = Depends(get_current_user)) -> User:
+    """Dependency that enforces per-user AI rate limiting."""
+    now = time.monotonic()
+    user_key = str(user.id)
+    # Prune timestamps older than the window
+    _ai_call_log[user_key] = [
+        ts for ts in _ai_call_log[user_key] if now - ts < _AI_RATE_WINDOW
+    ]
+    if len(_ai_call_log[user_key]) >= _AI_RATE_LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded — max 30 AI calls per hour",
+        )
+    _ai_call_log[user_key].append(now)
+    return user
+
 
 class RewriteRequest(BaseModel):
     text: str
@@ -32,7 +56,7 @@ class RewriteResponse(BaseModel):
 @router.post("/rewrite", response_model=RewriteResponse)
 async def rewrite(
     body: RewriteRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(_check_ai_rate_limit),
 ):
     """Rewrite a comment draft with the specified tone."""
     if not ANTHROPIC_API_KEY:
@@ -75,7 +99,7 @@ class CheckResponse(BaseModel):
 @router.post("/check", response_model=CheckResponse)
 async def check_comment(
     body: CheckRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(_check_ai_rate_limit),
 ):
     """Check if a comment is appropriate before posting."""
     if not ANTHROPIC_API_KEY:
@@ -100,7 +124,7 @@ class SummaryResponse(BaseModel):
 @router.get("/summarize/{issue_id}", response_model=SummaryResponse)
 async def summarize(
     issue_id: UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(_check_ai_rate_limit),
     db: AsyncSession = Depends(get_db),
 ):
     """Generate an AI summary of a topic's discussion thread."""

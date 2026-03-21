@@ -289,8 +289,8 @@ def _email_wrapper(content: str) -> str:
   {content}
   <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 24px;">
     <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-      <a href="{APP_URL}" style="color: #6b7280;">Open the board</a> ·
-      <a href="{APP_URL}/notifications" style="color: #6b7280;">Manage notifications</a>
+      <a href="{APP_URL}/topics" style="color: #6b7280;">Open the board</a> ·
+      <a href="{APP_URL}/topics" style="color: #6b7280;">Manage notifications</a>
     </p>
   </div>
 </div>"""

@@ -4,11 +4,12 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from audit import create_audit_entry
+from sqlalchemy import delete
 from auth import get_current_user, require_parent_a
 from database import get_db
 from models import Comment, Issue, IssueStatusLog, Tag, User
@@ -54,13 +55,32 @@ async def list_issues(
     status_filter: Optional[str] = Query(None, alias="status"),
     category: Optional[str] = None,
     tag: Optional[str] = None,
+    sort: Optional[str] = Query(None),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    # Priority ordering: urgent=0, high=1, normal=2, low=3
+    priority_order = case(
+        (Issue.priority == "urgent", 0),
+        (Issue.priority == "high", 1),
+        (Issue.priority == "normal", 2),
+        (Issue.priority == "low", 3),
+        else_=4,
+    )
+
+    sort_options = {
+        "priority": [priority_order.asc(), Issue.updated_at.desc()],
+        "newest": [Issue.created_at.desc()],
+        "oldest": [Issue.created_at.asc()],
+        "updated": [Issue.updated_at.desc()],
+        "due_date": [Issue.due_date.asc().nullslast(), Issue.updated_at.desc()],
+    }
+    order_by = sort_options.get(sort, [priority_order.asc(), Issue.updated_at.desc()])
+
     query = (
         select(Issue)
         .options(selectinload(Issue.creator), selectinload(Issue.assignee), selectinload(Issue.tags))
-        .order_by(Issue.updated_at.desc())
+        .order_by(*order_by)
     )
 
     if status_filter:
@@ -187,12 +207,11 @@ async def update_issue(
         db.add(log)
         issue.status = body.status
 
-    # Other fields (parent_a only except status)
+    # Other fields — both parents can change priority; rest is parent_a only
     for field in ("title", "description", "priority", "category", "assigned_to", "due_date"):
         val = getattr(body, field, None)
         if val is not None:
-            if field not in ("status",) and user.role != "parent_a":
-                # parent_b cannot change these fields
+            if field not in ("status", "priority") and user.role != "parent_a":
                 continue
             old_val = getattr(issue, field)
             if old_val != val:
@@ -276,3 +295,35 @@ async def get_timeline(
 
     entries.sort(key=lambda e: e.created_at)
     return entries
+
+
+@router.post("/{issue_id}/clear-comments")
+async def clear_practice_comments(
+    issue_id: UUID,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Clear all comments from the practice topic only."""
+    result = await db.execute(
+        select(Issue).where(Issue.id == issue_id)
+    )
+    issue = result.scalar_one_or_none()
+    if not issue:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
+    if "practice" not in issue.title.lower():
+        raise HTTPException(status_code=403, detail="Can only clear the practice topic")
+
+    del_comments = await db.execute(
+        delete(Comment).where(Comment.issue_id == issue_id)
+    )
+    del_status = await db.execute(
+        delete(IssueStatusLog).where(IssueStatusLog.issue_id == issue_id)
+    )
+
+    # Reset to default state
+    issue.status = "open"
+    issue.priority = "low"
+
+    await db.commit()
+    return {"cleared_comments": del_comments.rowcount, "cleared_status_logs": del_status.rowcount}

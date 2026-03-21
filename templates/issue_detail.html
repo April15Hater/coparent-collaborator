@@ -3,97 +3,82 @@
 
 {% block content %}
 <div class="mb-4">
-    <a href="/topics" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600 transition">
+    <a href="/topics" style="display:inline-flex;align-items:center;gap:4px;font-size:14px;color:#64748b">
         <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         All Topics
     </a>
 </div>
 
-<div id="topic-header" class="bg-white rounded-xl border border-slate-200 p-5 mb-4 shadow-sm">
-    <div class="text-center py-4 text-slate-400 text-sm">Loading...</div>
+<div id="topic-header" class="topic-header">
+    <div class="empty-state">Loading...</div>
 </div>
 
 <!-- AI Summary -->
 <div id="summary-container" class="hidden mb-4">
-    <div class="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-200 rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-semibold text-indigo-800 flex items-center gap-1.5">
-                <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    <div class="summary-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h3 class="summary-title">
+                <svg class="ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                 Thread Summary
             </h3>
-            <button onclick="document.getElementById('summary-container').classList.add('hidden')"
-                class="text-xs text-indigo-400 hover:text-indigo-600 transition">Dismiss</button>
+            <a onclick="document.getElementById('summary-container').classList.add('hidden')"
+                style="font-size:12px;color:#818cf8;cursor:pointer">Dismiss</a>
         </div>
-        <div id="summary-text" class="text-sm text-indigo-900 whitespace-pre-wrap leading-relaxed"></div>
+        <div id="summary-text" class="summary-text"></div>
     </div>
 </div>
 
-<div id="timeline" class="space-y-2 mb-6">
-</div>
+<div id="timeline" class="mb-4"></div>
 
 <!-- Comment form -->
-<div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-    <h3 class="text-sm font-semibold text-slate-700 mb-3">Add an update</h3>
+<div class="topic-header">
+    <h3 style="font-size:14px;font-weight:600;color:#475569;margin-bottom:12px">Add an update</h3>
     <form id="comment-form">
         <textarea id="comment-body" name="body" rows="3" required
             placeholder="Share an update, question, or response..."
-            class="w-full px-3.5 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm resize-y mb-3"></textarea>
+            class="textarea mb-3"></textarea>
 
         <!-- AI Tone buttons -->
-        <div id="tone-bar" class="flex flex-wrap gap-1.5 mb-3 items-center">
-            <span class="text-xs text-slate-400 flex items-center gap-1 mr-1">
-                <svg style="width:14px;height:14px" class="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        <div class="tone-bar">
+            <span class="tone-label">
+                <svg class="ai-icon" style="color:#8b5cf6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                 Adjust tone
             </span>
-            <button type="button" onclick="rewriteTone('softer')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition font-medium">Softer</button>
-            <button type="button" onclick="rewriteTone('stronger')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200 transition font-medium">Stronger</button>
-            <button type="button" onclick="rewriteTone('neutral')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200 transition font-medium">Neutral</button>
-            <button type="button" onclick="rewriteTone('professional')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition font-medium">Professional</button>
-            <button type="button" onclick="rewriteTone('shorter')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition font-medium">Shorter</button>
-            <button type="button" onclick="rewriteTone('longer')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition font-medium">Longer</button>
-            <button type="button" onclick="rewriteTone('more_detailed')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition font-medium">More Detail</button>
-            <button type="button" onclick="rewriteTone('less_detailed')"
-                class="tone-btn px-2.5 py-1 text-xs rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition font-medium">Less Detail</button>
+            <button type="button" onclick="rewriteTone('softer')" class="tone-btn tone-softer">Softer</button>
+            <button type="button" onclick="rewriteTone('stronger')" class="tone-btn tone-stronger">Stronger</button>
+            <button type="button" onclick="rewriteTone('neutral')" class="tone-btn tone-neutral">Neutral</button>
+            <button type="button" onclick="rewriteTone('professional')" class="tone-btn tone-professional">Professional</button>
+            <button type="button" onclick="rewriteTone('shorter')" class="tone-btn tone-short">Shorter</button>
+            <button type="button" onclick="rewriteTone('longer')" class="tone-btn tone-long">Longer</button>
+            <button type="button" onclick="rewriteTone('more_detailed')" class="tone-btn tone-detail">More Detail</button>
+            <button type="button" onclick="rewriteTone('less_detailed')" class="tone-btn tone-detail">Less Detail</button>
         </div>
 
         <!-- Rewrite status -->
-        <div id="rewrite-status" class="hidden mb-3 text-xs text-slate-500 flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2">
-            <svg style="width:14px;height:14px;flex-shrink:0" class="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        <div id="rewrite-status" class="rewrite-status hidden">
+            <svg class="ai-icon" style="color:#8b5cf6;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             <span id="rewrite-msg"></span>
-            <button type="button" onclick="undoRewrite()" id="undo-btn" class="hidden text-brand-600 hover:underline font-medium">Undo</button>
+            <a onclick="undoRewrite()" id="undo-btn" class="hidden">Undo</a>
         </div>
 
         <!-- Appropriateness warning -->
-        <div id="appropriateness-warning" class="hidden mb-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-            <p class="text-sm text-amber-800 font-semibold flex items-center gap-1.5">
+        <div id="appropriateness-warning" class="warning-box hidden">
+            <p class="warning-title">
                 <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
                 Heads up
             </p>
-            <p id="appropriateness-reason" class="text-sm text-amber-700 mt-1.5 leading-relaxed"></p>
-            <div class="flex gap-2 mt-3">
-                <button type="button" onclick="makeNice()"
-                    class="px-3 py-1.5 text-xs bg-brand-100 text-brand-800 rounded-lg hover:bg-brand-200 font-semibold flex items-center gap-1 transition">
-                    <svg style="width:12px;height:12px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            <p id="appropriateness-reason" class="warning-text"></p>
+            <div class="warning-actions">
+                <button type="button" onclick="makeNice()" class="btn btn-sm btn-primary" style="gap:4px">
+                    <svg class="ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                     Make nice
                 </button>
-                <button type="button" onclick="dismissWarning()"
-                    class="px-3 py-1.5 text-xs bg-white text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">Edit my message</button>
-                <button type="button" onclick="postAnyway()"
-                    class="px-3 py-1.5 text-xs bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition">Post anyway</button>
+                <button type="button" onclick="dismissWarning()" class="btn btn-sm btn-secondary">Edit my message</button>
+                <button type="button" onclick="postAnyway()" class="btn btn-sm" style="background:#fef3c7;color:#92400e">Post anyway</button>
             </div>
         </div>
 
-        <button type="submit" id="btn-post"
-            class="px-5 py-2.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition disabled:opacity-40 font-medium shadow-sm">
-            Post Update
-        </button>
+        <button type="submit" id="btn-post" class="btn btn-primary">Post Update</button>
     </form>
 </div>
 
@@ -104,17 +89,7 @@ const userRole = {{ user.role | tojson }};
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function fmtDate(ts) { if (!ts) return ''; const d = ts.endsWith('Z') ? ts : ts + 'Z'; return new Date(d).toLocaleString(); }
 
-const categoryColors = {
-    education: 'bg-blue-50 text-blue-700 border border-blue-200',
-    medical: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    behavioral: 'bg-amber-50 text-amber-700 border border-amber-200',
-    legal: 'bg-red-50 text-red-700 border border-red-200',
-    scheduling: 'bg-violet-50 text-violet-700 border border-violet-200',
-    financial: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
-    other: 'bg-slate-50 text-slate-600 border border-slate-200',
-};
-
-const aiIcon = `<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>`;
+const aiIconSvg = '<svg class="ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>';
 
 async function loadIssue() {
     try {
@@ -124,17 +99,26 @@ async function loadIssue() {
         renderHeader(issue);
     } catch (e) {
         document.getElementById('topic-header').innerHTML =
-            '<div class="text-center py-4 text-red-400 text-sm">Failed to load topic.</div>';
+            '<div class="empty-state" style="color:#ef4444">Failed to load topic.</div>';
     }
 }
 
 function renderHeader(issue) {
-    const catColor = categoryColors[issue.category] || categoryColors.other;
+    // Priority select — both parents can change
+    const prioritySelect = `
+        <select id="priority-select" class="select" style="width:auto;padding:6px 12px;font-size:13px">
+            <option value="low" ${issue.priority === 'low' ? 'selected' : ''}>Low</option>
+            <option value="normal" ${issue.priority === 'normal' ? 'selected' : ''}>Normal</option>
+            <option value="high" ${issue.priority === 'high' ? 'selected' : ''}>High</option>
+            <option value="urgent" ${issue.priority === 'urgent' ? 'selected' : ''}>Urgent</option>
+        </select>
+        <button onclick="updatePriority()" class="btn btn-sm btn-secondary">Update Priority</button>`;
+
     let statusActions = '';
     if (userRole === 'parent_a') {
         statusActions = `
-            <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2 flex-wrap items-center">
-                <select id="status-select" class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-brand-500">
+            <div class="status-actions">
+                <select id="status-select" class="select" style="width:auto;padding:6px 12px;font-size:13px">
                     <option value="open" ${issue.status === 'open' ? 'selected' : ''}>Open</option>
                     <option value="in_progress" ${issue.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
                     <option value="waiting_on_parent_a" ${issue.status === 'waiting_on_parent_a' ? 'selected' : ''}>Needs Joey's input</option>
@@ -142,26 +126,39 @@ function renderHeader(issue) {
                     <option value="resolved" ${issue.status === 'resolved' ? 'selected' : ''}>Resolved together</option>
                     <option value="closed" ${issue.status === 'closed' ? 'selected' : ''}>Closed</option>
                 </select>
-                <button onclick="updateStatus()" class="text-sm px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition">Update Status</button>
+                <button onclick="updateStatus()" class="btn btn-sm btn-secondary">Update Status</button>
+                <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px"></span>
+                ${prioritySelect}
+            </div>`;
+    } else {
+        statusActions = `
+            <div class="status-actions">
+                ${prioritySelect}
             </div>`;
     }
 
     document.getElementById('topic-header').innerHTML = `
-        <div class="flex items-start justify-between">
-            <div class="flex-1 min-w-0">
-                <h1 class="text-lg font-semibold text-slate-800 mb-2">${esc(issue.title)}</h1>
-                <div class="flex items-center gap-2 text-sm flex-wrap">
-                    <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${catColor}">${esc(issue.category)}</span>
-                    <span class="text-slate-500 font-medium">${esc(issue.display_status)}</span>
-                    ${issue.due_date ? `<span class="text-orange-500 font-medium text-xs">Due ${issue.due_date}</span>` : ''}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="flex:1;min-width:0">
+                <div class="topic-title">${esc(issue.title)}</div>
+                <div class="card-meta">
+                    <span class="badge badge-${issue.category}">${esc(issue.category)}</span>
+                    <span class="status status-${issue.status}" style="font-size:13px">${esc(issue.display_status)}</span>
+                    ${issue.due_date ? `<span style="color:#ea580c;font-weight:500;font-size:12px">Due ${issue.due_date}</span>` : ''}
                 </div>
             </div>
-            <button onclick="summarizeThread()" id="btn-summarize"
-                class="shrink-0 ml-3 flex items-center gap-1.5 text-xs px-3 py-1.5 bg-gradient-to-r from-indigo-50 to-violet-50 text-indigo-700 rounded-lg hover:from-indigo-100 hover:to-violet-100 border border-indigo-200 transition font-medium shadow-sm">
-                ${aiIcon} Summarize
+            <button onclick="summarizeThread()" id="btn-summarize" class="btn-summarize">
+                ${aiIconSvg} Summarize
             </button>
         </div>
-        ${issue.description ? `<p class="mt-3 text-slate-600 text-sm leading-relaxed">${esc(issue.description)}</p>` : ''}
+        ${issue.description ? `<p class="topic-desc">${esc(issue.description)}</p>` : ''}
+        ${issue.title.toLowerCase().includes('practice') ? `
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:8px">
+                <button onclick="clearPractice()" class="btn btn-sm btn-secondary" style="font-size:11px;color:#94a3b8">
+                    Clear all test messages
+                </button>
+                <span style="font-size:11px;color:#cbd5e1">Auto-clears every 10 minutes</span>
+            </div>` : ''}
         ${statusActions}
     `;
 }
@@ -174,43 +171,40 @@ async function loadTimeline() {
         renderTimeline(entries);
     } catch (e) {
         document.getElementById('timeline').innerHTML =
-            '<div class="text-center py-4 text-red-400 text-sm">Failed to load updates.</div>';
+            '<div class="empty-state" style="color:#ef4444">Failed to load updates.</div>';
     }
 }
 
 function renderTimeline(entries) {
     const el = document.getElementById('timeline');
     if (!entries.length) {
-        el.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">No updates yet. Start the conversation below.</div>';
+        el.innerHTML = '<div class="empty-state">No updates yet. Start the conversation below.</div>';
         return;
     }
     el.innerHTML = entries.map(e => {
         if (e.type === 'comment') {
             const date = fmtDate(e.created_at);
             const initials = (e.actor?.display_name || 'U').charAt(0).toUpperCase();
-            const isJoey = e.actor?.role === 'parent_a';
-            const avatarColor = isJoey ? 'bg-brand-100 text-brand-700' : 'bg-violet-100 text-violet-700';
+            const avatarClass = e.actor?.role === 'parent_a' ? 'avatar-a' : 'avatar-b';
             return `
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-                    <div class="flex items-start gap-3">
-                        <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700" class="${avatarColor}">${initials}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-semibold text-sm text-slate-800">${esc(e.actor?.display_name || 'Unknown')}</span>
-                                <span class="text-xs text-slate-400">${date}</span>
-                            </div>
-                            <p class="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">${esc(e.body)}</p>
+                <div class="comment">
+                    <div class="comment-header">
+                        <div class="avatar ${avatarClass}">${initials}</div>
+                        <div>
+                            <span class="comment-author">${esc(e.actor?.display_name || 'Unknown')}</span>
+                            <span class="comment-date" style="margin-left:8px">${date}</span>
                         </div>
                     </div>
+                    <div class="comment-body">${esc(e.body)}</div>
                 </div>`;
         } else {
             const date = fmtDate(e.created_at);
             return `
-                <div class="flex items-center gap-2 px-4 py-1.5 text-xs text-slate-400">
-                    <div class="flex-1 h-px bg-slate-200"></div>
-                    <span>${esc(e.actor?.display_name || 'System')} changed status to <strong class="text-slate-600">${esc(e.new_display || e.new_status)}</strong></span>
+                <div class="status-change">
+                    <div class="line"></div>
+                    <span>${esc(e.actor?.display_name || 'System')} changed status to <strong>${esc(e.new_display || e.new_status)}</strong></span>
                     <span>${date}</span>
-                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <div class="line"></div>
                 </div>`;
         }
     }).join('');
@@ -227,6 +221,18 @@ async function updateStatus() {
         loadIssue();
         loadTimeline();
     } catch (e) { alert('Failed to update status'); }
+}
+
+async function updatePriority() {
+    const newPriority = document.getElementById('priority-select').value;
+    try {
+        await fetch(`/api/issues/${issueId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({priority: newPriority}),
+        });
+        loadIssue();
+    } catch (e) { alert('Failed to update priority'); }
 }
 
 let skipCheck = false;
@@ -309,7 +315,7 @@ async function summarizeThread() {
     const textEl = document.getElementById('summary-text');
 
     btn.disabled = true;
-    btn.innerHTML = `${aiIcon} Summarizing...`;
+    btn.innerHTML = `${aiIconSvg} Summarizing...`;
 
     try {
         const resp = await fetch(`/api/ai/summarize/${issueId}`);
@@ -326,7 +332,7 @@ async function summarizeThread() {
         container.classList.remove('hidden');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `${aiIcon} Summarize`;
+        btn.innerHTML = `${aiIconSvg} Summarize`;
     }
 }
 
@@ -382,6 +388,13 @@ function undoRewrite() {
     document.getElementById('comment-body').value = originalText;
     originalText = '';
     document.getElementById('rewrite-status').classList.add('hidden');
+}
+
+async function clearPractice() {
+    try {
+        await fetch(`/api/issues/${issueId}/clear-comments`, { method: 'POST' });
+        loadTimeline();
+    } catch (e) { alert('Failed to clear'); }
 }
 
 loadIssue();

@@ -31,6 +31,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Ace's Co-Parenting Board", lifespan=lifespan)
 
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
 templates = Jinja2Templates(directory=str(_BASE_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(_BASE_DIR / "static")), name="static")
 
@@ -42,6 +52,7 @@ from routes_sync import router as sync_router
 from routes_invite import router as invite_router
 from routes_notifications import router as notifications_router
 from routes_ai_rewrite import router as ai_rewrite_router
+from routes_export import router as export_router
 
 app.include_router(auth_router)
 app.include_router(issues_router)
@@ -50,6 +61,7 @@ app.include_router(sync_router)
 app.include_router(invite_router)
 app.include_router(notifications_router)
 app.include_router(ai_rewrite_router)
+app.include_router(export_router)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────

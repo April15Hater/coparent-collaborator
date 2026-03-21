@@ -2,46 +2,52 @@
 {% block title %}Topics — Ace's Co-Parenting Board{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-5">
-    <h1 class="text-lg font-semibold text-slate-800">Topics</h1>
+<div class="page-header">
+    <h1 class="page-title">Topics</h1>
     {% if user.role == 'parent_a' %}
     <button onclick="document.getElementById('new-topic-modal').classList.remove('hidden')"
-        class="px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition shadow-sm">
-        + New Topic
-    </button>
+        class="btn btn-primary btn-sm">+ New Topic</button>
     {% endif %}
 </div>
 
-<!-- Filters -->
-<div class="flex gap-1.5 mb-5 flex-wrap">
-    <button onclick="filterIssues('',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition">All</button>
-    <button onclick="filterIssues('open',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Open</button>
-    <button onclick="filterIssues('in_progress',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition">In Progress</button>
-    <button onclick="filterIssues('waiting_on_parent_a',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Needs Joey</button>
-    <button onclick="filterIssues('waiting_on_parent_b',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Needs Christina</button>
-    <button onclick="filterIssues('resolved',this)" class="filter-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Resolved</button>
+<!-- Filters + Sort -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div class="filters" style="margin-bottom:0">
+        <button onclick="filterIssues('',this)" class="filter-btn active">All</button>
+        <button onclick="filterIssues('open',this)" class="filter-btn">Open</button>
+        <button onclick="filterIssues('in_progress',this)" class="filter-btn">In Progress</button>
+        <button onclick="filterIssues('waiting_on_parent_a',this)" class="filter-btn">Needs Joey</button>
+        <button onclick="filterIssues('waiting_on_parent_b',this)" class="filter-btn">Needs Christina</button>
+        <button onclick="filterIssues('resolved',this)" class="filter-btn">Resolved</button>
+    </div>
+    <select id="sort-select" onchange="changeSort(this.value)" class="select"
+        style="width:auto;padding:6px 12px;font-size:12px;border-radius:8px">
+        <option value="priority">Priority</option>
+        <option value="updated">Recently Updated</option>
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="due_date">Due Date</option>
+    </select>
 </div>
 
 <!-- Issue list -->
-<div id="issues-list" class="space-y-2">
-    <div class="text-center py-12 text-slate-400 text-sm">Loading topics...</div>
+<div id="issues-list">
+    <div class="empty-state">Loading topics...</div>
 </div>
 
-<!-- New topic modal (parent_a only) -->
-<div id="new-topic-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
-        <h2 class="text-lg font-semibold text-slate-800 mb-4">New Topic</h2>
-        <form id="new-topic-form" class="space-y-3">
-            <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Title</label>
-                <input type="text" name="title" required
-                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm" />
+<!-- New topic modal -->
+<div id="new-topic-modal" class="modal-overlay hidden">
+    <div class="modal">
+        <h2>New Topic</h2>
+        <form id="new-topic-form">
+            <div class="mb-3">
+                <label class="label">Title</label>
+                <input type="text" name="title" required class="input" />
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid-2 mb-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Category</label>
-                    <select name="category" required
-                        class="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                    <label class="label">Category</label>
+                    <select name="category" required class="select">
                         <option value="education">Education</option>
                         <option value="medical">Medical</option>
                         <option value="behavioral">Behavioral</option>
@@ -52,9 +58,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Priority</label>
-                    <select name="priority"
-                        class="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                    <label class="label">Priority</label>
+                    <select name="priority" class="select">
                         <option value="normal">Normal</option>
                         <option value="high">High</option>
                         <option value="urgent">Urgent</option>
@@ -62,63 +67,37 @@
                     </select>
                 </div>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Description</label>
-                <textarea name="description" rows="3"
-                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+            <div class="mb-3">
+                <label class="label">Description</label>
+                <textarea name="description" rows="3" class="textarea"></textarea>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Due Date (optional)</label>
-                <input type="date" name="due_date"
-                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" />
+            <div class="mb-3">
+                <label class="label">Due Date (optional)</label>
+                <input type="date" name="due_date" class="input" />
             </div>
             <div class="flex gap-2 pt-2">
-                <button type="submit"
-                    class="flex-1 py-2.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition font-medium">Create Topic</button>
-                <button type="button"
-                    onclick="document.getElementById('new-topic-modal').classList.add('hidden')"
-                    class="flex-1 py-2.5 bg-slate-100 text-slate-600 text-sm rounded-lg hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="btn btn-primary flex-1">Create Topic</button>
+                <button type="button" onclick="document.getElementById('new-topic-modal').classList.add('hidden')"
+                    class="btn btn-secondary flex-1">Cancel</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-const categoryColors = {
-    education: 'bg-blue-50 text-blue-700 border border-blue-200',
-    medical: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    behavioral: 'bg-amber-50 text-amber-700 border border-amber-200',
-    legal: 'bg-red-50 text-red-700 border border-red-200',
-    scheduling: 'bg-violet-50 text-violet-700 border border-violet-200',
-    financial: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
-    other: 'bg-slate-50 text-slate-600 border border-slate-200',
-};
-
-const priorityIndicators = {
-    urgent: '<span style="display:inline-flex;align-items:center;gap:4px;color:#dc2626;font-weight:600;font-size:12px"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse 2s infinite"></span>Urgent</span>',
-    high: '<span style="display:inline-flex;align-items:center;gap:4px;color:#ea580c;font-size:12px"><span style="width:6px;height:6px;border-radius:50%;background:#fb923c"></span>High</span>',
-    normal: '',
-    low: '',
-};
-
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-function statusColor(s) {
-    const m = {
-        open: 'font-medium text-amber-600',
-        in_progress: 'font-medium text-blue-600',
-        waiting_on_parent_a: 'font-medium text-orange-600',
-        waiting_on_parent_b: 'font-medium text-orange-600',
-        resolved: 'font-medium text-emerald-600',
-        closed: 'text-slate-400',
-    };
-    return m[s] || 'text-slate-400';
+let currentFilter = '';
+let currentSort = 'priority';
+
+function changeSort(sort) {
+    currentSort = sort;
+    loadIssues(currentFilter);
 }
 
-let currentFilter = '';
-
 async function loadIssues(statusFilter) {
-    const url = statusFilter ? `/api/issues?status=${statusFilter}` : '/api/issues';
+    let url = '/api/issues?sort=' + currentSort;
+    if (statusFilter) url += '&status=' + statusFilter;
     try {
         const resp = await fetch(url);
         if (resp.status === 401) { window.location = '/login'; return; }
@@ -126,45 +105,50 @@ async function loadIssues(statusFilter) {
         renderIssues(issues);
     } catch (e) {
         document.getElementById('issues-list').innerHTML =
-            '<div class="text-center py-12 text-red-400 text-sm">Failed to load topics.</div>';
+            '<div class="empty-state" style="color:#ef4444">Failed to load topics.</div>';
     }
 }
 
 function renderIssues(issues) {
     const el = document.getElementById('issues-list');
     if (!issues.length) {
-        el.innerHTML = '<div class="text-center py-12 text-slate-400 text-sm">No topics found.</div>';
+        el.innerHTML = '<div class="empty-state">No topics found.</div>';
         return;
     }
-    el.innerHTML = issues.map(i => `
-        <a href="/topics/${i.id}" class="block bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-300 hover:shadow-md transition-all group">
-            <div class="flex items-start justify-between">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        ${priorityIndicators[i.priority] || ''}
-                        <h3 class="font-medium text-slate-800 group-hover:text-brand-700 transition truncate">${esc(i.title)}</h3>
+    el.innerHTML = issues.map(i => {
+        const priorityHtml = i.priority === 'urgent'
+            ? '<span class="priority priority-urgent"><span class="dot"></span>Urgent</span>'
+            : i.priority === 'high'
+            ? '<span class="priority priority-high"><span class="dot"></span>High</span>'
+            : '';
+
+        return `
+        <a href="/topics/${i.id}" class="card">
+            <div class="card-header">
+                <div class="card-body">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        ${priorityHtml}
                     </div>
-                    <div class="flex items-center gap-2 text-xs flex-wrap">
-                        <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${categoryColors[i.category] || categoryColors.other}">${esc(i.category)}</span>
-                        <span class="${statusColor(i.status)}">${esc(i.display_status)}</span>
-                        ${i.due_date ? `<span class="text-orange-500 font-medium">Due ${i.due_date}</span>` : ''}
-                        <span class="text-slate-400">${i.comment_count} update${i.comment_count !== 1 ? 's' : ''}</span>
+                    <div class="card-title">${esc(i.title)}</div>
+                    <div class="card-meta">
+                        <span class="badge badge-${i.category}">${esc(i.category)}</span>
+                        <span class="status status-${i.status}">${esc(i.display_status)}</span>
+                        ${i.due_date ? `<span style="color:#ea580c;font-weight:500">Due ${i.due_date}</span>` : ''}
+                        <span class="text-muted">${i.comment_count} update${i.comment_count !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
-                <svg style="width:16px;height:16px;flex-shrink:0" class="text-slate-300 group-hover:text-brand-400 transition ml-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="card-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
             </div>
-        </a>
-    `).join('');
+        </a>`;
+    }).join('');
 }
 
 function filterIssues(status, btn) {
     currentFilter = status;
-    document.querySelectorAll('.filter-btn').forEach(b => {
-        b.className = b.className.replace(/bg-slate-200 text-slate-700/g, 'bg-slate-100 text-slate-500');
-    });
-    if (btn) btn.className = btn.className.replace(/bg-slate-100 text-slate-500/g, 'bg-slate-200 text-slate-700');
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
     loadIssues(status);
 }
 
@@ -194,4 +178,16 @@ document.getElementById('new-topic-form')?.addEventListener('submit', async (e) 
 
 loadIssues('');
 </script>
+
+<!-- Export options -->
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end">
+    <a href="/export/csv" class="btn btn-sm btn-secondary" style="text-decoration:none">
+        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Download CSV
+    </a>
+    <a href="/export/print" target="_blank" class="btn btn-sm btn-secondary" style="text-decoration:none">
+        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        Print / Save PDF
+    </a>
+</div>
 {% endblock %}

@@ -1,27 +1,56 @@
-{% extends "base.html" %}
-{% block title %}Access Denied — Ace's Co-Parenting Board{% endblock %}
-{% block nav %}{% endblock %}
-
-{% block content %}
-<div class="flex items-center justify-center min-h-[80vh]">
-    <div class="w-full max-w-sm text-center">
-        <h1 class="text-2xl font-semibold text-gray-800 mb-2">
-            Ace's Co-Parenting Board
-        </h1>
-        <p class="text-sm text-gray-500 mb-6">
-            Your account hasn't been set up yet. If you were invited, ask the other parent to add your email address.
-        </p>
-        <p class="text-xs text-gray-400">
-            Signed in through Cloudflare Access but no matching account found.
-        </p>
-        {% if cf_team_domain %}
-        <p class="mt-6">
-            <a href="https://{{ cf_team_domain }}.cloudflareaccess.com/cdn-cgi/access/logout"
-               class="text-sm text-blue-600 hover:underline">
-                Sign out and try a different account
-            </a>
-        </p>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Denied — Ace's Co-Parenting Board</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc; min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 16px; -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0; padding: 40px 32px; width: 100%; max-width: 380px;
+      text-align: center;
+    }
+    .icon-wrap {
+      width: 48px; height: 48px; border-radius: 12px; background: #fef2f2;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    }
+    .icon-wrap svg { width: 24px; height: 24px; color: #ef4444; }
+    h1 { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .message { color: #64748b; font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+    .hint { color: #94a3b8; font-size: 12px; }
+    .logout-link {
+      display: inline-block; margin-top: 24px; color: #3b82f6; font-size: 14px;
+      text-decoration: none;
+    }
+    .logout-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
     </div>
-</div>
-{% endblock %}
+    <h1>Ace's Co-Parenting Board</h1>
+    <p class="message">
+      Your account hasn't been set up yet. If you were invited, ask the other parent to add your email address.
+    </p>
+    <p class="hint">
+      Signed in through Cloudflare Access but no matching account found.
+    </p>
+    {% if cf_team_domain %}
+    <a href="https://{{ cf_team_domain }}.cloudflareaccess.com/cdn-cgi/access/logout"
+       class="logout-link">
+      Sign out and try a different account
+    </a>
+    {% endif %}
+  </div>
+</body>
+</html>

@@ -6,6 +6,7 @@ from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from config import TIMEZONE
 from database import async_session
 
 log = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ async def _run_daily_digest():
     from zoneinfo import ZoneInfo
     from notifications import send_daily_digest
 
-    now = datetime.now(ZoneInfo("America/New_York"))
+    now = datetime.now(ZoneInfo(TIMEZONE))
     hour_str = f"{now.hour:02d}:00"
     log.info("Running daily digest for hour %s", hour_str)
     async with async_session() as db:
@@ -40,12 +41,52 @@ async def _run_daily_digest():
             log.exception("Daily digest job failed")
 
 
+async def _clear_practice_topic():
+    """Auto-clear comments from the practice topic every 10 minutes."""
+    from sqlalchemy import delete, select
+    from models import Issue, Comment, IssueStatusLog
+
+    async with async_session() as db:
+        try:
+            result = await db.execute(
+                select(Issue).where(Issue.title.ilike("%Practice Topic%"))
+            )
+            practice = result.scalar_one_or_none()
+            if not practice:
+                return
+
+            del_c = await db.execute(
+                delete(Comment).where(Comment.issue_id == practice.id)
+            )
+            del_s = await db.execute(
+                delete(IssueStatusLog).where(IssueStatusLog.issue_id == practice.id)
+            )
+            practice.status = "open"
+            practice.priority = "low"
+
+            total = del_c.rowcount + del_s.rowcount
+            if total > 0:
+                log.info("Cleared %d entries from practice topic", total)
+            await db.commit()
+        except Exception:
+            log.exception("Practice topic clear failed")
+            await db.rollback()
+
+
 def start_scheduler():
     """Start the notification scheduler."""
+    # Clear practice topic every 10 minutes
+    scheduler.add_job(
+        _clear_practice_topic,
+        CronTrigger(minute="*/10", timezone=TIMEZONE),
+        id="clear_practice",
+        replace_existing=True,
+    )
+
     # Due date reminders — run daily at 9 AM ET
     scheduler.add_job(
         _run_due_date_reminders,
-        CronTrigger(hour=9, minute=0, timezone="America/New_York"),
+        CronTrigger(hour=9, minute=0, timezone=TIMEZONE),
         id="due_date_reminders",
         replace_existing=True,
     )
@@ -54,7 +95,7 @@ def start_scheduler():
     # Each user sets their preferred digest_hour; the job checks at each hour
     scheduler.add_job(
         _run_daily_digest,
-        CronTrigger(minute=0, timezone="America/New_York"),
+        CronTrigger(minute=0, timezone=TIMEZONE),
         id="daily_digest",
         replace_existing=True,
     )
