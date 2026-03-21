@@ -248,11 +248,13 @@
         <div class="nav-inner">
             <div style="display:flex;align-items:center;gap:6px">
                 <a href="/topics" class="nav-title">Ace's Co-Parenting Board</a>
-                <a href="https://github.com/April15Hater/coparent-collaborator/releases" target="_blank"
+                <a href="https://github.com/April15Hater/coparent-collaborator" target="_blank"
                    style="font-size:10px;color:#64748b;background:#f1f5f9;padding:2px 7px;border-radius:10px;font-weight:500">{{ app_version | default('dev') }}</a>
             </div>
             {% if user %}
             <div class="nav-user">
+                <a href="https://github.com/April15Hater/coparent-collaborator#readme" target="_blank"
+                   style="color:#94a3b8;font-size:13px">Help</a>
                 <span>{{ user.display_name }}</span>
                 <a href="javascript:void(0)"
                     onclick="fetch('/auth/logout',{method:'POST'}).then(r=>r.json()).then(d=>window.location=d.logout_url)">
