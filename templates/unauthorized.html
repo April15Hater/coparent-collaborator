@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Access Denied — Ace's Co-Parenting Board{% endblock %}
+{% block nav %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[80vh]">
+    <div class="w-full max-w-sm text-center">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-2">
+            Ace's Co-Parenting Board
+        </h1>
+        <p class="text-sm text-gray-500 mb-6">
+            Your account hasn't been set up yet. If you were invited, ask the other parent to add your email address.
+        </p>
+        <p class="text-xs text-gray-400">
+            Signed in through Cloudflare Access but no matching account found.
+        </p>
+        {% if cf_team_domain %}
+        <p class="mt-6">
+            <a href="https://{{ cf_team_domain }}.cloudflareaccess.com/cdn-cgi/access/logout"
+               class="text-sm text-blue-600 hover:underline">
+                Sign out and try a different account
+            </a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

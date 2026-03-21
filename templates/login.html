@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Ace's Co-Parenting Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-slate-800">Ace's Co-Parenting Board</h1>
+        <p class="text-slate-500 text-sm mt-1">Sign in to continue</p>
+      </div>
+
+      <div id="loading" class="py-6 text-center">
+        <div class="text-sm text-slate-400">Checking authentication...</div>
+      </div>
+
+      <div id="not-auth" class="hidden">
+        <p class="text-sm text-slate-600 mb-4 text-center">
+          You'll be asked to verify your email through Cloudflare Access.
+        </p>
+        <a href="/topics"
+           class="block w-full text-center bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition shadow-sm">
+          Continue to sign in
+        </a>
+      </div>
+
+      <div id="no-account" class="hidden text-center">
+        <p class="text-sm text-slate-500 mb-4">
+          Your email isn't set up on the board yet. If you were invited, ask the other parent to add your email address.
+        </p>
+        {% if cf_team_domain %}
+        <a href="https://{{ cf_team_domain }}.cloudflareaccess.com/cdn-cgi/access/logout"
+           class="text-sm text-blue-600 hover:underline">
+          Sign out and try a different account
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (async () => {
+      try {
+        const resp = await fetch('/auth/me');
+        if (resp.ok) { window.location.href = '/topics'; return; }
+        const data = await resp.json();
+        if (resp.status === 403 && data.detail === 'no_account') {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('no-account').classList.remove('hidden');
+        } else {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('not-auth').classList.remove('hidden');
+        }
+      } catch {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('not-auth').classList.remove('hidden');
+      }
+    })();
+  </script>
+</body>
+</html>

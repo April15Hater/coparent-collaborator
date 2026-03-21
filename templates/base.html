@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ace's Co-Parenting Board{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .sparkle::before { content: '\2728 '; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    {% block nav %}
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="/topics" class="flex items-center gap-2 font-semibold text-slate-800 hover:text-brand-600 transition">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                Ace's Co-Parenting Board
+            </a>
+            {% if user %}
+            <div class="flex items-center gap-3 text-sm">
+                <span class="text-slate-500">{{ user.display_name }}</span>
+                <a href="javascript:void(0)"
+                    onclick="fetch('/auth/logout',{method:'POST'}).then(r=>r.json()).then(d=>window.location=d.logout_url)"
+                    class="text-slate-400 hover:text-slate-600 transition text-xs">
+                    Sign out
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
+
+    <main class="max-w-3xl mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="max-w-3xl mx-auto px-4 py-8 text-center">
+        <p class="text-xs text-slate-300">Ace's Co-Parenting Board</p>
+    </footer>
+</body>
+</html>
