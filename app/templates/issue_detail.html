@@ -136,8 +136,8 @@ function renderHeader(issue) {
                 <select id="status-select" class="select" style="width:auto;padding:6px 12px;font-size:13px">
                     <option value="open" ${issue.status === 'open' ? 'selected' : ''}>Open</option>
                     <option value="in_progress" ${issue.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                    <option value="waiting_on_parent_a" ${issue.status === 'waiting_on_parent_a' ? 'selected' : ''}>Needs Father's input</option>
-                    <option value="waiting_on_parent_b" ${issue.status === 'waiting_on_parent_b' ? 'selected' : ''}>Needs Mother's input</option>
+                    <option value="waiting_on_parent_a" ${issue.status === 'waiting_on_parent_a' ? 'selected' : ''}>Needs Joey's input</option>
+                    <option value="waiting_on_parent_b" ${issue.status === 'waiting_on_parent_b' ? 'selected' : ''}>Needs Christina's input</option>
                     <option value="resolved" ${issue.status === 'resolved' ? 'selected' : ''}>Resolved together</option>
                     <option value="closed" ${issue.status === 'closed' ? 'selected' : ''}>Closed</option>
                 </select>
@@ -251,7 +251,6 @@ function renderEntry(e) {
                     <div class="line"></div>
                 </div>`;
         }
-    }).join('');
 }
 
 async function updateStatus() {
