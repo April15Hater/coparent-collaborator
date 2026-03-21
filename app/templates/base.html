@@ -253,8 +253,12 @@
             </div>
             {% if user %}
             <div class="nav-user">
+                <a href="https://github.com/April15Hater/coparent-collaborator/issues/new?template=bug_report.yml" target="_blank"
+                   style="color:#94a3b8;font-size:12px">Report Bug</a>
+                <a href="https://github.com/April15Hater/coparent-collaborator/issues/new?template=feature_request.yml" target="_blank"
+                   style="color:#94a3b8;font-size:12px">Request Feature</a>
                 <a href="https://github.com/April15Hater/coparent-collaborator#readme" target="_blank"
-                   style="color:#94a3b8;font-size:13px">Help</a>
+                   style="color:#94a3b8;font-size:12px">Help</a>
                 <span>{{ user.display_name }}</span>
                 <a href="javascript:void(0)"
                     onclick="fetch('/auth/logout',{method:'POST'}).then(r=>r.json()).then(d=>window.location=d.logout_url)">
