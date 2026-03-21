@@ -1,6 +1,6 @@
 # Ace's Co-Parenting Board
 
-A shared space for staying organized on everything going on with Ace. Each topic gets its own thread so nothing gets lost, and both mother and father can respond on their own time.
+A shared space for staying organized on everything going on with Ace. Each topic gets its own thread so nothing gets lost, and both parents can respond on their own time.
 
 **Live at:** [coparent.joeysolomon.com](https://coparent.joeysolomon.com)
 
@@ -15,17 +15,17 @@ Each issue gets its own thread. You can see all open topics at a glance, filter 
 
 **Categories:** Education, Medical, Behavioral, Legal, Scheduling, Financial
 
-**Statuses:** Open, In Progress, Needs Joey's Input, Needs Christina's Input, Resolved Together, Closed
+**Statuses:** Open, In Progress, Needs Father's Input, Needs Mother's Input, Resolved Together, Closed
 
-**Priority:** Low, Normal, High, Urgent — both mother and father can change the priority on any topic.
+**Priority:** Low, Normal, High, Urgent — both parents can change the priority on any topic.
 
 **Sorting:** Priority (default), Recently Updated, Newest First, Oldest First, Due Date
 
 ### Updates
-Both mother and father can post updates on any topic at any time. Updates are timestamped and permanent — once posted, they can't be edited or deleted. This keeps the record clear for both sides.
+Both parents can post updates on any topic at any time. Updates are timestamped and permanent — once posted, they can't be edited or deleted. This keeps the record clear for both sides.
 
 ### Tone Adjustment
-Before posting an update, you can adjust how it reads using the tone buttons below the text box. Options include Softer, Stronger, Neutral, Professional, Shorter, Longer, More Detail, and Less Detail. This helps both mother and father communicate clearly without things getting misread or coming across the wrong way. You can always undo a rewrite or edit it further before posting.
+Before posting an update, you can adjust how it reads using the tone buttons below the text box. Options include Softer, Stronger, Neutral, Professional, Shorter, Longer, More Detail, and Less Detail. This helps both parents communicate clearly without things getting misread or coming across the wrong way. You can always undo a rewrite or edit it further before posting.
 
 If a message might come across as confrontational, a gentle "Heads up" will appear with the option to rephrase it automatically ("Make nice"), edit it yourself, or post it as-is.
 
@@ -42,7 +42,7 @@ Options:
 - Mute specific topics you don't need alerts for
 
 ### Due Dates
-Topics can have due dates for time-sensitive decisions (hearing deadlines, meeting dates, etc.). Both mother and father can see upcoming deadlines at a glance.
+Topics can have due dates for time-sensitive decisions (hearing deadlines, meeting dates, etc.). Both parents can see upcoming deadlines at a glance.
 
 ### Export
 Download everything as a CSV (opens in Excel or Google Sheets) or open a printable view you can save as a PDF. Both options are at the bottom of the topics page.
@@ -60,7 +60,7 @@ These were set up from the March 2026 email exchange:
 4. Drug Test Results — Documentation
 5. Skipping School & Lying About Whereabouts
 6. Phone Consolidation — Single Managed Device
-7. Schedule Adjustment — Christina's Night Shifts
+7. Schedule Adjustment — Mother's Night Shifts
 8. Optima Academy — Alternative Education Option
 
 ## Technical Details
