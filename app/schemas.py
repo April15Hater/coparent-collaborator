@@ -40,8 +40,8 @@ class IssueCategory(str, Enum):
 _STATUS_DISPLAY = {
     "open": "Open",
     "in_progress": "In Progress",
-    "waiting_on_parent_a": "Needs Joey's input",
-    "waiting_on_parent_b": "Needs Christina's input",
+    "waiting_on_parent_a": "Needs Father's input",
+    "waiting_on_parent_b": "Needs Mother's input",
     "resolved": "Resolved together",
     "closed": "Closed",
 }

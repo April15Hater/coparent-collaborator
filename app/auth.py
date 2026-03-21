@@ -1,6 +1,6 @@
 """Authentication via Cloudflare Access JWT.
 
-Cloudflare Access sits in front of coparent.joeysolomon.com and handles
+Cloudflare Access sits in front of the application and handles
 login (Google, email OTP, etc.). It sets a Cf-Access-Jwt-Assertion header
 containing the authenticated user's email. We validate that JWT and look
 up the user in our database.

@@ -101,7 +101,7 @@ async def sync_issue_detail(
     issue_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """Full issue detail with comments and status log, for AI context building."""
+    """Full issue detail with comments and status log."""
     result = await db.execute(
         select(Issue)
         .options(
