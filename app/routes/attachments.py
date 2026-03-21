@@ -4,14 +4,14 @@ import logging
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_user, require_parent_a
-from app.config import ATTACHMENTS_DIR, MAX_ATTACHMENT_SIZE, SYNC_API_KEY
+from app.config import ATTACHMENTS_DIR, MAX_ATTACHMENT_SIZE
 from app.database import get_db
 from app.models import Attachment, Comment, Issue, User
 
@@ -47,7 +47,7 @@ def _validate_file(file: UploadFile):
     if file.content_type not in ALLOWED_TYPES and ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail=f"File type not allowed. Accepted: PDF, images, Word, Excel, text/CSV.",
+            detail="File type not allowed. Accepted: PDF, images, Word, Excel, text/CSV.",
         )
 
 
