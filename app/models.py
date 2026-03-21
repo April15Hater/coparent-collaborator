@@ -1,9 +1,10 @@
-"""SQLAlchemy ORM models for Co-Parenting Board."""
+"""SQLAlchemy ORM models for Ace Vault."""
 
 import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     Column,
     Date,
@@ -83,6 +84,7 @@ class Issue(Base):
     comments = relationship("Comment", back_populates="issue", order_by="Comment.created_at")
     status_logs = relationship("IssueStatusLog", back_populates="issue", order_by="IssueStatusLog.created_at")
     tags = relationship("Tag", secondary="issue_tags", back_populates="issues")
+    attachments = relationship("Attachment", back_populates="issue", order_by="Attachment.created_at")
 
 
 class Tag(Base):
@@ -102,6 +104,25 @@ class IssueTag(Base):
     tag_id = Column(UUIDType, ForeignKey("tags.id"), primary_key=True)
 
 
+class Attachment(Base):
+    """File attachment on a topic or comment."""
+    __tablename__ = "attachments"
+
+    id = Column(UUIDType, primary_key=True, default=new_uuid)
+    issue_id = Column(UUIDType, ForeignKey("issues.id"), nullable=False)
+    comment_id = Column(UUIDType, ForeignKey("comments.id"), nullable=True)
+    filename = Column(Text, nullable=False)
+    content_type = Column(Text, nullable=False)
+    size = Column(BigInteger, nullable=False)  # bytes
+    file_path = Column(Text, nullable=False)  # relative to attachments dir
+    uploaded_by = Column(UUIDType, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+    issue = relationship("Issue", back_populates="attachments")
+    comment = relationship("Comment", back_populates="attachments")
+    uploader = relationship("User")
+
+
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -115,6 +136,7 @@ class Comment(Base):
 
     issue = relationship("Issue", back_populates="comments")
     author = relationship("User", back_populates="comments")
+    attachments = relationship("Attachment", back_populates="comment")
 
 
 class IssueStatusLog(Base):
