@@ -1,4 +1,4 @@
-"""Pydantic request/response schemas for Ace Vault."""
+"""Pydantic request/response schemas for Co-Parenting Board."""
 
 from datetime import date, datetime
 from typing import Any, Optional

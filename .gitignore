@@ -4,7 +4,6 @@ __pycache__/
 .env
 *.db
 *.db-journal
-data/
 .venv/
 venv/
 *.egg-info/
@@ -12,3 +11,4 @@ dist/
 build/
 .pytest_cache/
 node_modules/
+data/

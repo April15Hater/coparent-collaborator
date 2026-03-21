@@ -1,4 +1,4 @@
-"""Environment configuration for Ace Vault shared portal."""
+"""Environment configuration for Co-Parenting Board shared portal."""
 
 import logging
 import os
@@ -25,7 +25,7 @@ PORT: int = int(os.getenv("PORT", "8443"))
 ACE_ON_WEEK_ANCHOR: str = os.getenv("ACE_ON_WEEK_ANCHOR", "2026-03-13")
 TIMEZONE: str = os.getenv("TIMEZONE", "America/New_York")
 
-# API key used by Tier 2 (vault) to pull data via sync API
+# API key used by authorized integrations to pull data via sync API
 SYNC_API_KEY: str = os.getenv("SYNC_API_KEY", "")
 
 # Cloudflare Access

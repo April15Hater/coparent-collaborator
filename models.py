@@ -1,4 +1,4 @@
-"""SQLAlchemy ORM models for Ace Vault."""
+"""SQLAlchemy ORM models for Co-Parenting Board."""
 
 import uuid
 from datetime import datetime, timezone

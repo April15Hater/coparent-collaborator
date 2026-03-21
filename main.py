@@ -1,4 +1,4 @@
-"""Ace Vault — Shared Co-Parenting Board (Tier 1)."""
+"""Co-Parenting Board."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -56,7 +56,7 @@ app.include_router(ai_rewrite_router)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "ace-vault-shared"}
+    return {"status": "ok", "service": "coparent-board"}
 
 
 # ── HTML pages ────────────────────────────────────────────────────────────────
