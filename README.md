@@ -1,5 +1,9 @@
 # Ace's Co-Parenting Board
 
+[![CI](https://github.com/April15Hater/coparent-collaborator/actions/workflows/lint.yml/badge.svg)](https://github.com/April15Hater/coparent-collaborator/actions)
+[![Release](https://img.shields.io/github/v/release/April15Hater/coparent-collaborator)](https://github.com/April15Hater/coparent-collaborator/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A shared space for staying organized on everything going on with Ace. Each topic gets its own thread so nothing gets lost, and both parents can respond on their own time.
 
 

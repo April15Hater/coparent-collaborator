@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -13,7 +13,7 @@ from app.auth import get_current_user
 from app.database import get_db
 from app.models import Comment, Issue, User
 from app.notifications import notify_new_comment
-from app.schemas import CommentCreate, CommentResponse, UserResponse
+from app.schemas import CommentCreate, CommentResponse
 
 router = APIRouter(prefix="/api/issues/{issue_id}/comments", tags=["comments"])
 
