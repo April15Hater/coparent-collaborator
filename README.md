@@ -2,6 +2,7 @@
 
 A shared space for staying organized on everything going on with Ace. Each topic gets its own thread so nothing gets lost, and both parents can respond on their own time.
 
+
 ## How to Sign In
 
 There are no passwords. When you visit the site, you'll be asked to verify your email address — it sends a one-time code to your inbox (similar to how a bank verifies your identity). Enter the code and you're signed in for 30 days. You can also use Google to authenticate. Email addresses have been setup ahead of time and linked to each parents' account.
@@ -65,13 +66,18 @@ These were set up from the March 2026 email exchange:
 
 Self-hosted FastAPI application with SQLite database. Authentication via Cloudflare Access. Email notifications via SMTP. AI features powered by Claude.
 
-### Local Development
+### Setup
 ```bash
+# 1. Configure environment
+cp .env.example .env
+# Edit .env — set parent emails, Cloudflare Access, SMTP, API keys
+
+# 2. Install dependencies
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # fill in required values
-python main.py
+
+# 3. Run
+uvicorn app.main:app --reload
 ```
 
-### Environment Variables
-See `.env.example` for all configuration options.
+All user accounts, email aliases, and notification recipients are configured via environment variables in `.env` — no emails are hardcoded in the source code. See `.env.example` for all options.
