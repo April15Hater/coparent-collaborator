@@ -10,9 +10,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.config import SYNC_API_KEY
-from app.database import get_db
-from app.models import Comment, Issue, IssueStatusLog
+from config import SYNC_API_KEY
+from database import get_db
+from models import Attachment, Comment, Issue, IssueStatusLog
 
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 
@@ -155,3 +155,66 @@ async def sync_full_dump(db: AsyncSession = Depends(get_db)):
     issues = await sync_issues(since=None, db=db)
     comments = await sync_comments(since=None, db=db)
     return {"issues": issues, "comments": comments}
+
+
+@router.get("/attachments", dependencies=[Depends(verify_sync_key)])
+async def sync_attachments(
+    since: Optional[str] = Query(None),
+    uploader_role: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    """List attachments, optionally filtered by uploader role and time."""
+    from sqlalchemy.orm import selectinload as sil
+
+    query = (
+        select(Attachment)
+        .options(sil(Attachment.uploader))
+        .order_by(Attachment.created_at.asc())
+    )
+    if since:
+        since_dt = datetime.fromisoformat(since)
+        query = query.where(Attachment.created_at >= since_dt)
+
+    result = await db.execute(query)
+    atts = result.scalars().all()
+
+    # Filter by uploader role if requested
+    if uploader_role:
+        atts = [a for a in atts if a.uploader and a.uploader.role == uploader_role]
+
+    return [
+        {
+            "id": str(a.id),
+            "issue_id": str(a.issue_id),
+            "comment_id": str(a.comment_id) if a.comment_id else None,
+            "filename": a.filename,
+            "content_type": a.content_type,
+            "size": a.size,
+            "file_path": a.file_path,
+            "uploader_role": a.uploader.role if a.uploader else None,
+            "uploader_name": a.uploader.display_name if a.uploader else None,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+        for a in atts
+    ]
+
+
+@router.get("/attachments/{attachment_id}/download", dependencies=[Depends(verify_sync_key)])
+async def sync_download_attachment(
+    attachment_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Download attachment file (for vault to pull and send to Paperless)."""
+    from fastapi.responses import FileResponse
+    from config import ATTACHMENTS_DIR
+
+    result = await db.execute(select(Attachment).where(Attachment.id == attachment_id))
+    att = result.scalar_one_or_none()
+    if not att:
+        raise HTTPException(status_code=404, detail="Attachment not found")
+
+    full_path = ATTACHMENTS_DIR / att.file_path
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail="File not found on disk")
+
+    return FileResponse(path=str(full_path), filename=att.filename, media_type=att.content_type)
