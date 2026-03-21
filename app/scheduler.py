@@ -16,7 +16,7 @@ scheduler = AsyncIOScheduler()
 
 async def _run_due_date_reminders():
     """Check for upcoming due dates and send reminders."""
-    from app.notifications import send_due_date_reminders
+    from notifications import send_due_date_reminders
 
     log.info("Running due date reminder check")
     async with async_session() as db:
@@ -29,7 +29,7 @@ async def _run_due_date_reminders():
 async def _run_daily_digest():
     """Send daily digest emails."""
     from zoneinfo import ZoneInfo
-    from app.notifications import send_daily_digest
+    from notifications import send_daily_digest
 
     now = datetime.now(ZoneInfo(TIMEZONE))
     hour_str = f"{now.hour:02d}:00"
@@ -44,7 +44,7 @@ async def _run_daily_digest():
 async def _clear_practice_topic():
     """Auto-clear comments from the practice topic every 10 minutes."""
     from sqlalchemy import delete, select
-    from app.models import Issue, Comment, IssueStatusLog
+    from models import Issue, Comment, IssueStatusLog
 
     async with async_session() as db:
         try:
@@ -73,8 +73,27 @@ async def _clear_practice_topic():
             await db.rollback()
 
 
+async def _run_cooldown_digest():
+    """Send batched notifications after cooldown expires (10 min no activity)."""
+    from notifications import send_cooldown_digest
+
+    async with async_session() as db:
+        try:
+            await send_cooldown_digest(db)
+        except Exception:
+            log.exception("Cooldown digest job failed")
+
+
 def start_scheduler():
     """Start the notification scheduler."""
+    # Cooldown digest — check every 2 minutes for batched updates
+    scheduler.add_job(
+        _run_cooldown_digest,
+        CronTrigger(minute="*/2", timezone=TIMEZONE),
+        id="cooldown_digest",
+        replace_existing=True,
+    )
+
     # Clear practice topic every 10 minutes
     scheduler.add_job(
         _clear_practice_topic,

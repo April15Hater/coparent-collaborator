@@ -94,6 +94,7 @@ class IssueUpdate(BaseModel):
     category: Optional[IssueCategory] = None
     assigned_to: Optional[UUID] = None
     due_date: Optional[date] = None
+    clear_due_date: Optional[bool] = None
     status_reason: Optional[str] = None
 
 

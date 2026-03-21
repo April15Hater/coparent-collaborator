@@ -207,11 +207,17 @@ async def update_issue(
         db.add(log)
         issue.status = body.status
 
+    # Clear due date if requested
+    if body.clear_due_date and issue.due_date is not None:
+        old_values["due_date"] = str(issue.due_date)
+        new_values["due_date"] = "None"
+        issue.due_date = None
+
     # Other fields — both parents can change priority; rest is parent_a only
     for field in ("title", "description", "priority", "category", "assigned_to", "due_date"):
         val = getattr(body, field, None)
         if val is not None:
-            if field not in ("status", "priority") and user.role != "parent_a":
+            if field not in ("status", "priority", "due_date") and user.role != "parent_a":
                 continue
             old_val = getattr(issue, field)
             if old_val != val:

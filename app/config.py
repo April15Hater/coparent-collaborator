@@ -7,12 +7,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).parent.parent / ".env")
+load_dotenv(Path(__file__).parent / ".env")
 
 log = logging.getLogger(__name__)
 
-# Database — SQLite
-_DATA_DIR = Path(__file__).parent.parent / "data"
+# Database — SQLite 
+_DATA_DIR = Path(__file__).parent / "data"
 _DATA_DIR.mkdir(exist_ok=True)
 DATABASE_PATH: str = os.getenv("DATABASE_PATH", str(_DATA_DIR / "shared.db"))
 DATABASE_URL: str = f"sqlite+aiosqlite:///{DATABASE_PATH}"
@@ -25,7 +25,7 @@ PORT: int = int(os.getenv("PORT", "8443"))
 ACE_ON_WEEK_ANCHOR: str = os.getenv("ACE_ON_WEEK_ANCHOR", "2026-03-13")
 TIMEZONE: str = os.getenv("TIMEZONE", "America/New_York")
 
-# API key used by authorized integrations to pull data via sync API
+# API key used by Tier 2 (vault) to pull data via sync API
 SYNC_API_KEY: str = os.getenv("SYNC_API_KEY", "")
 
 # Cloudflare Access
@@ -43,10 +43,10 @@ APP_URL: str = os.getenv("APP_URL", "")
 ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 AI_MODEL: str = os.getenv("AI_MODEL", "claude-haiku-4-5-20251001")
 
-# SMTP — relay for notification emails (not auth)
+# SMTP —  relay for notification emails (not auth)
 SMTP_HOST: str = os.getenv("SMTP_HOST", "")
 SMTP_PORT: int = int(os.getenv("SMTP_PORT", "25"))
-SMTP_FROM: str = os.getenv("SMTP_FROM", "Co-Parenting Board <noreply@example.com>")
+SMTP_FROM: str = os.getenv("SMTP_FROM", "Ace's Board <noreply@example.com>")
 
 # ── Startup validation ──────────────────────────────────────────────────────
 _INSECURE_DEFAULTS = {"change-me-in-production", "change-me-sync-key", ""}

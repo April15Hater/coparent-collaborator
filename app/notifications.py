@@ -1,6 +1,6 @@
 """Email notifications for Ace's Co-Parenting Board.
 
-Sends via SMTP relay. This module handles:
+Sends via SMTP relay () . This module handles:
 - Instant notifications (new comment, status change)
 - Daily digest emails
 - Due date reminders (7d, 3d, 1d)
@@ -89,6 +89,27 @@ async def _already_sent(
     return result.scalar_one_or_none() is not None
 
 
+async def _recently_notified(
+    db: AsyncSession, user_id: UUID, notification_type: str,
+    cooldown_minutes: int = 10,
+) -> bool:
+    """Check if we sent this type of notification recently (cooldown).
+
+    After the first instant email, subsequent updates within the cooldown
+    window are batched. The scheduler sends a mini-digest after 10 min
+    of inactivity (see scheduler._run_cooldown_digest).
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=cooldown_minutes)
+    result = await db.execute(
+        select(NotificationLog).where(
+            NotificationLog.user_id == user_id,
+            NotificationLog.notification_type == notification_type,
+            NotificationLog.sent_at >= cutoff,
+        )
+    )
+    return result.scalar_one_or_none() is not None
+
+
 async def _log_sent(
     db: AsyncSession, user_id: UUID, notification_type: str, reference_id: UUID,
 ):
@@ -122,6 +143,9 @@ async def notify_new_comment(
             continue
         if await _already_sent(db, recipient.id, "instant_comment", comment.id):
             continue
+        if await _recently_notified(db, recipient.id, "instant_comment"):
+            log.info("Skipping instant notification to %s — cooldown (10 min), will batch", recipient.email)
+            continue
 
         email_to = prefs.notify_email or recipient.email
         subject = f"New update on: {issue.title}"
@@ -146,7 +170,7 @@ async def notify_status_change(
     result = await db.execute(select(User).where(User.id != changer.id))
     recipients = result.scalars().all()
 
-    from app.schemas import friendly_status
+    from schemas import friendly_status
 
     for recipient in recipients:
         prefs = await _get_prefs(db, recipient.id)
@@ -277,6 +301,81 @@ async def send_daily_digest(db: AsyncSession, target_hour: str = "08:00"):
     await db.commit()
 
 
+# ── Cooldown digest (batched updates after 10 min of no activity) ────────────
+
+async def send_cooldown_digest(db: AsyncSession):
+    """Check for updates that were throttled during cooldown and send a digest.
+
+    Called every 2 minutes by the scheduler. If the most recent instant
+    notification for a user was 10+ minutes ago AND there are un-notified
+    comments since then, send a mini-digest.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)
+
+    users_result = await db.execute(select(User))
+    users = users_result.scalars().all()
+
+    for user in users:
+        prefs = await _get_prefs(db, user.id)
+        if not prefs or not prefs.enabled or not prefs.instant_comments:
+            continue
+
+        # Find their most recent instant notification
+        last_notif = await db.execute(
+            select(NotificationLog)
+            .where(
+                NotificationLog.user_id == user.id,
+                NotificationLog.notification_type == "instant_comment",
+            )
+            .order_by(NotificationLog.sent_at.desc())
+            .limit(1)
+        )
+        last = last_notif.scalar_one_or_none()
+        if not last:
+            continue
+
+        # Only act if the last notification was 10+ minutes ago (cooldown expired)
+        if last.sent_at.replace(tzinfo=timezone.utc) > cutoff:
+            continue
+
+        # Find comments by OTHER users since last notification that haven't been notified
+        comments_result = await db.execute(
+            select(Comment)
+            .options(selectinload(Comment.author), selectinload(Comment.issue))
+            .where(
+                Comment.created_at > last.sent_at,
+                Comment.author_id != user.id,
+            )
+            .order_by(Comment.created_at.asc())
+        )
+        pending_comments = comments_result.scalars().all()
+
+        # Filter already-sent and muted
+        unsent = []
+        for c in pending_comments:
+            if await _already_sent(db, user.id, "instant_comment", c.id):
+                continue
+            if await _is_muted(db, user.id, c.issue_id):
+                continue
+            unsent.append(c)
+
+        if not unsent:
+            continue
+
+        # Send a mini-digest
+        email_to = prefs.notify_email or user.email
+        subject = f"{len(unsent)} new update{'s' if len(unsent) > 1 else ''} on Ace's Co-Parenting Board"
+        html = _cooldown_digest_html(user.display_name, unsent)
+
+        sent = await _send_email(email_to, subject, html)
+        if sent:
+            for c in unsent:
+                await _log_sent(db, user.id, "instant_comment", c.id)
+            log.info("Sent cooldown digest to %s (%d updates)", email_to, len(unsent))
+
+    await db.commit()
+
+
 # ── Email templates ──────────────────────────────────────────────────────────
 
 def _email_wrapper(content: str) -> str:
@@ -366,6 +465,33 @@ def _due_date_email_html(
     <a href="{APP_URL}/topics/{issue_id}"
        style="color: #2563eb; font-size: 14px; text-decoration: none;">
       View topic &rarr;
+    </a>
+  </p>""")
+
+
+def _cooldown_digest_html(recipient_name: str, comments: list) -> str:
+    """Mini-digest for batched updates after cooldown."""
+    import html
+    items = ""
+    for c in comments[:10]:
+        issue_title = c.issue.title if c.issue else "Unknown"
+        author = c.author.display_name if c.author else "Unknown"
+        items += f"""\
+    <div style="padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
+      <p style="color: #6b7280; font-size: 12px; margin: 0;">{html.escape(author)} on <strong>{html.escape(issue_title)}</strong></p>
+      <p style="color: #374151; font-size: 13px; margin: 2px 0 0;">{html.escape(c.body[:150])}{'...' if len(c.body) > 150 else ''}</p>
+    </div>"""
+
+    return _email_wrapper(f"""\
+  <p style="color: #4b5563; line-height: 1.6; margin: 0 0 16px;">
+    Hi {html.escape(recipient_name)}, here are the updates you missed:
+  </p>
+  <div style="background: #f9fafb; padding: 4px 12px; border-radius: 6px; margin: 0 0 16px;">
+    {items}
+  </div>
+  <p style="margin: 0;">
+    <a href="{APP_URL}/topics" style="color: #2563eb; font-size: 14px; text-decoration: none;">
+      Open the board &rarr;
     </a>
   </p>""")
 

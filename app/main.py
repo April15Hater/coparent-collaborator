@@ -1,4 +1,4 @@
-"""Co-Parenting Board."""
+"""Ace Vault — Shared Co-Parenting Board (Tier 1)."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -45,14 +45,14 @@ templates = Jinja2Templates(directory=str(_BASE_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(_BASE_DIR / "static")), name="static")
 
 # API routers
-from app.routes.auth import router as auth_router
-from app.routes.issues import router as issues_router
-from app.routes.comments import router as comments_router
-from app.routes.sync import router as sync_router
-from app.routes.invite import router as invite_router
-from app.routes.notifications import router as notifications_router
-from app.routes.ai import router as ai_rewrite_router
-from app.routes.export import router as export_router
+from routes_auth import router as auth_router
+from routes_issues import router as issues_router
+from routes_comments import router as comments_router
+from routes_sync import router as sync_router
+from routes_invite import router as invite_router
+from routes_notifications import router as notifications_router
+from routes_ai_rewrite import router as ai_rewrite_router
+from routes_export import router as export_router
 
 app.include_router(auth_router)
 app.include_router(issues_router)
@@ -116,4 +116,4 @@ async def topic_detail_page(request: Request, issue_id: str, db: AsyncSession = 
 
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)

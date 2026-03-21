@@ -85,6 +85,7 @@
 <script>
 const issueId = {{ issue_id | tojson }};
 const userRole = {{ user.role | tojson }};
+let isMuted = false;
 
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function fmtDate(ts) { if (!ts) return ''; const d = ts.endsWith('Z') ? ts : ts + 'Z'; return new Date(d).toLocaleString(); }
@@ -114,6 +115,20 @@ function renderHeader(issue) {
         </select>
         <button onclick="updatePriority()" class="btn btn-sm btn-secondary">Update Priority</button>`;
 
+    // Due date — both parents can set/change/remove
+    const dueDateControl = `
+        <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px"></span>
+        <input type="date" id="due-date-input" class="select" style="width:auto;padding:6px 12px;font-size:13px"
+            value="${issue.due_date || ''}">
+        <button onclick="updateDueDate()" class="btn btn-sm btn-secondary">Set Due Date</button>
+        ${issue.due_date ? `<button onclick="clearDueDate()" class="btn btn-sm" style="font-size:11px;color:#94a3b8;background:transparent;padding:4px 8px">Remove</button>` : ''}`;
+
+    // Mute button
+    const muteBtn = `
+        <button onclick="toggleMute()" id="btn-mute" class="btn btn-sm" style="font-size:11px;color:#94a3b8;background:transparent;padding:4px 8px;margin-left:auto">
+            ${isMuted ? '🔔 Unmute' : '🔕 Mute notifications'}
+        </button>`;
+
     let statusActions = '';
     if (userRole === 'parent_a') {
         statusActions = `
@@ -129,11 +144,15 @@ function renderHeader(issue) {
                 <button onclick="updateStatus()" class="btn btn-sm btn-secondary">Update Status</button>
                 <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px"></span>
                 ${prioritySelect}
+                ${dueDateControl}
+                ${muteBtn}
             </div>`;
     } else {
         statusActions = `
             <div class="status-actions">
                 ${prioritySelect}
+                ${dueDateControl}
+                ${muteBtn}
             </div>`;
     }
 
@@ -175,13 +194,37 @@ async function loadTimeline() {
     }
 }
 
+const VISIBLE_LIMIT = 5;
+
 function renderTimeline(entries) {
     const el = document.getElementById('timeline');
     if (!entries.length) {
         el.innerHTML = '<div class="empty-state">No updates yet. Start the conversation below.</div>';
         return;
     }
-    el.innerHTML = entries.map(e => {
+
+    const showAll = entries.length <= VISIBLE_LIMIT;
+    const visible = showAll ? entries : entries.slice(-VISIBLE_LIMIT);
+    const hiddenCount = entries.length - visible.length;
+
+    let html = '';
+    if (!showAll) {
+        html += `<div style="text-align:center;padding:8px">
+            <button onclick="showAllEntries()" id="btn-show-more" class="btn btn-sm btn-secondary" style="font-size:12px">
+                Show ${hiddenCount} earlier update${hiddenCount !== 1 ? 's' : ''}
+            </button>
+        </div>`;
+    }
+    html += visible.map(e => renderEntry(e)).join('');
+    el.innerHTML = html;
+}
+
+function showAllEntries() {
+    const el = document.getElementById('timeline');
+    el.innerHTML = cachedTimeline.map(e => renderEntry(e)).join('');
+}
+
+function renderEntry(e) {
         if (e.type === 'comment') {
             const date = fmtDate(e.created_at);
             const initials = (e.actor?.display_name || 'U').charAt(0).toUpperCase();
@@ -195,7 +238,8 @@ function renderTimeline(entries) {
                             <span class="comment-date" style="margin-left:8px">${date}</span>
                         </div>
                     </div>
-                    <div class="comment-body">${esc(e.body)}</div>
+                    <div class="comment-body">${esc(e.body.length > 300 ? e.body.slice(0, 300) + '...' : e.body)}</div>
+                    ${e.body.length > 300 ? `<a onclick="this.previousElementSibling.textContent=cachedTimeline.find(x=>x.id==='${e.id}')?.body||'';this.remove()" style="color:#2563eb;cursor:pointer;font-size:12px">Show more</a>` : ''}
                 </div>`;
         } else {
             const date = fmtDate(e.created_at);
@@ -390,6 +434,43 @@ function undoRewrite() {
     document.getElementById('rewrite-status').classList.add('hidden');
 }
 
+async function updateDueDate() {
+    const val = document.getElementById('due-date-input').value;
+    if (!val) return;
+    try {
+        await fetch(`/api/issues/${issueId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({due_date: val}),
+        });
+        loadIssue();
+    } catch (e) { alert('Failed to update due date'); }
+}
+
+async function clearDueDate() {
+    try {
+        await fetch(`/api/issues/${issueId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({clear_due_date: true}),
+        });
+        loadIssue();
+    } catch (e) { alert('Failed to remove due date'); }
+}
+
+async function toggleMute() {
+    try {
+        if (isMuted) {
+            await fetch(`/api/notifications/mute/${issueId}`, { method: 'DELETE' });
+            isMuted = false;
+        } else {
+            await fetch(`/api/notifications/mute/${issueId}`, { method: 'POST' });
+            isMuted = true;
+        }
+        loadIssue();
+    } catch (e) { alert('Failed to update mute'); }
+}
+
 async function clearPractice() {
     try {
         await fetch(`/api/issues/${issueId}/clear-comments`, { method: 'POST' });
@@ -397,7 +478,17 @@ async function clearPractice() {
     } catch (e) { alert('Failed to clear'); }
 }
 
-loadIssue();
-loadTimeline();
+// Load mute state first, then render
+(async () => {
+    try {
+        const resp = await fetch('/api/notifications/muted');
+        if (resp.ok) {
+            const muted = await resp.json();
+            isMuted = muted.includes(issueId);
+        }
+    } catch (e) {}
+    loadIssue();
+    loadTimeline();
+})();
 </script>
 {% endblock %}
