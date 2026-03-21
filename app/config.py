@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 _version_file = Path(__file__).parent / "VERSION"
 APP_VERSION = _version_file.read_text().strip() if _version_file.exists() else "dev"
 
-# Database — SQLite 
+# Database — SQLite
 _DATA_DIR = Path(__file__).parent / "data"
 _DATA_DIR.mkdir(exist_ok=True)
 DATABASE_PATH: str = os.getenv("DATABASE_PATH", str(_DATA_DIR / "shared.db"))
