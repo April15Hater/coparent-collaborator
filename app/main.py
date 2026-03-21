@@ -1,4 +1,4 @@
-"""Co-Parenting Board."""
+"""Ace Vault — Shared Co-Parenting Board (Tier 1)."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -10,10 +10,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.config import APP_VERSION, CF_TEAM_DOMAIN, HOST, PORT
-from app.database import get_db, init_db
-from app.auth import get_optional_user
-from app.scheduler import start_scheduler, stop_scheduler
+from config import APP_VERSION, CF_TEAM_DOMAIN, HOST, PORT
+from database import get_db, init_db
+from auth import get_optional_user
+from scheduler import start_scheduler, stop_scheduler
 from sqlalchemy.ext.asyncio import AsyncSession
 
 _BASE_DIR = Path(__file__).parent
@@ -53,6 +53,7 @@ from routes_invite import router as invite_router
 from routes_notifications import router as notifications_router
 from routes_ai_rewrite import router as ai_rewrite_router
 from routes_export import router as export_router
+from routes_attachments import router as attachments_router
 
 app.include_router(auth_router)
 app.include_router(issues_router)
@@ -62,6 +63,7 @@ app.include_router(invite_router)
 app.include_router(notifications_router)
 app.include_router(ai_rewrite_router)
 app.include_router(export_router)
+app.include_router(attachments_router)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
