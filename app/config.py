@@ -1,4 +1,4 @@
-"""Environment configuration for Co-Parenting Board shared portal."""
+"""Environment configuration for Ace Vault shared portal."""
 
 import logging
 import os
@@ -15,11 +15,16 @@ log = logging.getLogger(__name__)
 _version_file = Path(__file__).parent / "VERSION"
 APP_VERSION = _version_file.read_text().strip() if _version_file.exists() else "dev"
 
-# Database — SQLite
+# Database — SQLite on CT131
 _DATA_DIR = Path(__file__).parent / "data"
 _DATA_DIR.mkdir(exist_ok=True)
 DATABASE_PATH: str = os.getenv("DATABASE_PATH", str(_DATA_DIR / "shared.db"))
 DATABASE_URL: str = f"sqlite+aiosqlite:///{DATABASE_PATH}"
+
+# ── Attachments ─────────────────────────────────────────────────────────────
+ATTACHMENTS_DIR = Path(os.getenv("ATTACHMENTS_DIR", str(_DATA_DIR / "attachments")))
+ATTACHMENTS_DIR.mkdir(parents=True, exist_ok=True)
+MAX_ATTACHMENT_SIZE = int(os.getenv("MAX_ATTACHMENT_SIZE", str(10 * 1024 * 1024)))  # 10MB
 
 SECRET_KEY: str = os.getenv("SECRET_KEY", "")
 HOST: str = os.getenv("HOST", "0.0.0.0")
@@ -41,16 +46,16 @@ CF_POLICY_AUD: str = os.getenv("CF_POLICY_AUD", CF_AUD)  # alias
 DEV_USER_EMAIL: str = os.getenv("DEV_USER_EMAIL", "")
 
 # App URL (for links)
-APP_URL: str = os.getenv("APP_URL", "")
+APP_URL: str = os.getenv("APP_URL", "https://coparent.joeysolomon.com")
 
 # Anthropic (AI rewrite)
 ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 AI_MODEL: str = os.getenv("AI_MODEL", "claude-haiku-4-5-20251001")
 
-# SMTP —  relay for notification emails (not auth)
+# SMTP — CT115 relay for notification emails (not auth)
 SMTP_HOST: str = os.getenv("SMTP_HOST", "")
 SMTP_PORT: int = int(os.getenv("SMTP_PORT", "25"))
-SMTP_FROM: str = os.getenv("SMTP_FROM", "Ace's Board <noreply@example.com>")
+SMTP_FROM: str = os.getenv("SMTP_FROM", "Ace's Board <noreply@joeysolomon.com>")
 
 # ── Startup validation ──────────────────────────────────────────────────────
 _INSECURE_DEFAULTS = {"change-me-in-production", "change-me-sync-key", ""}
