@@ -192,7 +192,7 @@ async def update_issue(
     if body.status and body.status != issue.status:
         # Only parent_a can close/resolve
         if body.status in ("closed", "resolved") and user.role != "parent_a":
-            raise HTTPException(status_code=403, detail="Only Joey can close or resolve topics")
+            raise HTTPException(status_code=403, detail="Only the primary parent can close or resolve topics")
 
         old_values["status"] = issue.status
         new_values["status"] = body.status

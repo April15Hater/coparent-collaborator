@@ -11,7 +11,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 
 log = logging.getLogger(__name__)
 
-# Database — SQLite on CT131
+# Database — SQLite
 _DATA_DIR = Path(__file__).parent.parent / "data"
 _DATA_DIR.mkdir(exist_ok=True)
 DATABASE_PATH: str = os.getenv("DATABASE_PATH", str(_DATA_DIR / "shared.db"))
@@ -37,16 +37,16 @@ CF_POLICY_AUD: str = os.getenv("CF_POLICY_AUD", CF_AUD)  # alias
 DEV_USER_EMAIL: str = os.getenv("DEV_USER_EMAIL", "")
 
 # App URL (for links)
-APP_URL: str = os.getenv("APP_URL", "https://coparent.joeysolomon.com")
+APP_URL: str = os.getenv("APP_URL", "")
 
 # Anthropic (AI rewrite)
 ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 AI_MODEL: str = os.getenv("AI_MODEL", "claude-haiku-4-5-20251001")
 
-# SMTP — CT115 relay for notification emails (not auth)
+# SMTP — relay for notification emails (not auth)
 SMTP_HOST: str = os.getenv("SMTP_HOST", "")
 SMTP_PORT: int = int(os.getenv("SMTP_PORT", "25"))
-SMTP_FROM: str = os.getenv("SMTP_FROM", "Ace's Board <noreply@joeysolomon.com>")
+SMTP_FROM: str = os.getenv("SMTP_FROM", "Co-Parenting Board <noreply@example.com>")
 
 # ── Startup validation ──────────────────────────────────────────────────────
 _INSECURE_DEFAULTS = {"change-me-in-production", "change-me-sync-key", ""}

@@ -1,6 +1,6 @@
 """Email notifications for Ace's Co-Parenting Board.
 
-Sends via SMTP relay (CT115) on the LAN. This module handles:
+Sends via SMTP relay. This module handles:
 - Instant notifications (new comment, status change)
 - Daily digest emails
 - Due date reminders (7d, 3d, 1d)

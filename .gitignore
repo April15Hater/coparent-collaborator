@@ -2,12 +2,9 @@ __pycache__/
 *.py[cod]
 *.so
 .env
-shared/.env
-vault/.env
 *.db
 *.db-journal
-vault/data/
-shared/data/
+data/
 .venv/
 venv/
 *.egg-info/
