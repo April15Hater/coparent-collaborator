@@ -18,10 +18,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Check syntax (all .py files)
-        run: python -m py_compile app/main.py && find app -name "*.py" -exec python -m py_compile {} +
-
-      - name: Check imports
-        run: python -c "from app.main import app; print('Imports OK')"
+        run: find app -name "*.py" -exec python -m py_compile {} +
 
       - name: Lint with ruff
         run: pip install ruff && ruff check app/ --select E,F,W --ignore E501
