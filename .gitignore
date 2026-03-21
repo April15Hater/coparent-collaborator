@@ -2,8 +2,12 @@ __pycache__/
 *.py[cod]
 *.so
 .env
+shared/.env
+vault/.env
 *.db
 *.db-journal
+vault/data/
+shared/data/
 .venv/
 venv/
 *.egg-info/
@@ -11,4 +15,3 @@ dist/
 build/
 .pytest_cache/
 node_modules/
-data/

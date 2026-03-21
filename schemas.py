@@ -52,17 +52,6 @@ def friendly_status(status: str, viewer_role: str | None = None) -> str:
     return _STATUS_DISPLAY.get(status, status)
 
 
-CATEGORY_COLORS = {
-    "education": "blue",
-    "medical": "green",
-    "behavioral": "orange",
-    "legal": "red",
-    "scheduling": "purple",
-    "financial": "yellow",
-    "other": "gray",
-}
-
-
 # ---------- Users ----------
 
 class UserResponse(BaseModel):
@@ -76,11 +65,6 @@ class UserResponse(BaseModel):
 
 
 # ---------- Tags ----------
-
-class TagCreate(BaseModel):
-    name: str
-    color: Optional[str] = None
-
 
 class TagResponse(BaseModel):
     id: UUID
@@ -189,14 +173,3 @@ class AuditEntry(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
-
-
-# ---------- Custody ----------
-
-class CustodyStatus(BaseModel):
-    is_on_week: bool
-    week_label: str
-    week_start: date
-    week_end: date
-    days_remaining: int
-    controlling_parent: str
