@@ -49,18 +49,16 @@ Download everything as a CSV (opens in Excel or Google Sheets) or open a printab
 ### Practice Topic
 There's a "Practice Topic" at the bottom of the list where you can test posting updates, adjusting tone, and changing priority without affecting real topics. It auto-clears every 10 minutes.
 
-## Current Topics
+## Example Topics
 
-These were set up from the March 2026 email exchange:
+Topics are created based on what both parents need to coordinate on. *(Generalized for privacy.)*
 
-1. Suspension Hearing & Alternative School Placement
-2. 504 Manifestation Determination Meeting (3/24)
-3. Therapy Scheduling — Consistent Weekly Sessions
-4. Drug Test Results — Documentation
-5. Skipping School & Lying About Whereabouts
-6. Phone Consolidation — Single Managed Device
-7. Schedule Adjustment — Mother's Night Shifts
-8. Optima Academy — Alternative Education Option
+1. School Meeting — Upcoming Parent-Teacher Conference
+2. Medical — Therapy Schedule Coordination
+3. Schedule Change — Work Night Shifts
+4. Behavioral — Consistent Rules Across Households
+5. Education — Alternative School Options
+6. Device Management — Screen Time & Phone Rules
 
 ## Technical Details
 
