@@ -37,7 +37,7 @@ async def send_invite(
     user=Depends(require_parent_a),
     db: AsyncSession = Depends(get_db),
 ):
-    """Add the co-parent as parent_b. They sign in via Cloudflare Access."""
+    """parent_a adds the co-parent as parent_b. She signs in via Cloudflare Access."""
     email = body.email.strip().lower()
     if await _email_in_use(db, email):
         raise HTTPException(status_code=400, detail="An account with this email already exists")

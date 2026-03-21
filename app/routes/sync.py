@@ -1,4 +1,4 @@
-"""Sync API for authorized integrations to pull data."""
+"""Sync API for Tier 2 (private vault) to pull data."""
 
 import hmac
 from datetime import datetime
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/sync", tags=["sync"])
 
 
 async def verify_sync_key(x_sync_key: str = Header(...)):
-    """Verify the sync API key from integration."""
+    """Verify the sync API key from Tier 2."""
     if not SYNC_API_KEY or not hmac.compare_digest(x_sync_key, SYNC_API_KEY):
         raise HTTPException(status_code=403, detail="Invalid sync key")
 
@@ -101,7 +101,7 @@ async def sync_issue_detail(
     issue_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """Full issue detail with comments and status log."""
+    """Full issue detail with comments and status log, for AI context building."""
     result = await db.execute(
         select(Issue)
         .options(
@@ -151,7 +151,7 @@ async def sync_issue_detail(
 
 @router.get("/full", dependencies=[Depends(verify_sync_key)])
 async def sync_full_dump(db: AsyncSession = Depends(get_db)):
-    """Full data dump for initial integration sync."""
+    """Full data dump for initial Tier 2 sync."""
     issues = await sync_issues(since=None, db=db)
     comments = await sync_comments(since=None, db=db)
     return {"issues": issues, "comments": comments}
