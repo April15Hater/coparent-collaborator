@@ -4,7 +4,7 @@ import csv
 import io
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse, HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,7 @@ from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Comment, Issue, IssueStatusLog, User
+from app.models import Comment, Issue, User
 from app.schemas import friendly_status
 
 router = APIRouter(prefix="/export", tags=["export"])
@@ -164,7 +164,6 @@ async def export_print(
         issue = item["issue"]
         status = friendly_status(issue.status, "parent_a")
         priority_class = f"priority-{issue.priority}" if issue.priority in ("urgent", "high") else ""
-        due = f" &middot; Due {issue.due_date}" if issue.due_date else ""
 
         html_parts.append(f"""
 <div class="topic">

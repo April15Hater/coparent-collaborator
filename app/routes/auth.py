@@ -6,7 +6,7 @@ user info and logout functionality.
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_current_user, invalidate_cf_keys
 from app.config import CF_TEAM_DOMAIN

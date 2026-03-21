@@ -13,7 +13,7 @@ from typing import Optional
 from uuid import UUID
 
 import aiosmtplib
-from sqlalchemy import select, func, and_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -221,7 +221,6 @@ async def send_due_date_reminders(db: AsyncSession):
                 if await _is_muted(db, user.id, issue.id):
                     continue
 
-                ref_key = f"due_{days_before}d_{issue.id}"
                 # Use issue.id as reference but check with type to avoid dups
                 log_type = f"due_date_{days_before}d"
                 if await _already_sent(db, user.id, log_type, issue.id):
@@ -293,7 +292,7 @@ async def send_daily_digest(db: AsyncSession, target_hour: str = "08:00"):
         upcoming_issues = upcoming_result.scalars().all()
 
         email_to = prefs.notify_email or user.email
-        subject = f"Daily Update — Ace's Co-Parenting Board"
+        subject = "Daily Update — Ace's Co-Parenting Board"
         html = _digest_email_html(user.display_name, filtered, upcoming_issues)
 
         await _send_email(email_to, subject, html)
