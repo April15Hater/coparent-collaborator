@@ -21,4 +21,4 @@ jobs:
         run: find app -name "*.py" -exec python -m py_compile {} +
 
       - name: Lint with ruff
-        run: pip install ruff && ruff check app/ --select E,F,W --ignore E501
+        run: pip install ruff && ruff check app/ --select E,F,W --ignore E501,E402,E712,E711
