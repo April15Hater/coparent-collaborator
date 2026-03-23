@@ -258,8 +258,8 @@ function renderEntry(e) {
                             <span class="comment-date" style="margin-left:8px">${date}</span>
                         </div>
                     </div>
-                    <div class="comment-body" ${e.body.length > 300 ? `data-full="${encodeURIComponent(e.body)}"` : ''}>${esc(e.body.length > 300 ? e.body.slice(0, 300) + '...' : e.body)}</div>
-                    ${e.body.length > 300 ? `<a onclick="const cb=this.previousElementSibling;cb.textContent=decodeURIComponent(cb.dataset.full);cb.removeAttribute('data-full');this.remove()" style="color:#2563eb;cursor:pointer;font-size:12px">Show more</a>` : ''}
+                    <div class="comment-body${e.body.length > 300 ? ' comment-body-truncated' : ''}">${esc(e.body)}</div>
+                    ${e.body.length > 300 ? `<a onclick="this.previousElementSibling.classList.remove('comment-body-truncated');this.remove()" style="color:#2563eb;cursor:pointer;font-size:12px">Show more</a>` : ''}
                 </div>`;
         } else {
             const date = fmtDate(e.created_at);
