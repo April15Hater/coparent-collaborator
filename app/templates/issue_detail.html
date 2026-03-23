@@ -259,7 +259,7 @@ function renderEntry(e) {
                         </div>
                     </div>
                     <div class="comment-body">${esc(e.body.length > 300 ? e.body.slice(0, 300) + '...' : e.body)}</div>
-                    ${e.body.length > 300 ? `<a onclick="this.previousElementSibling.textContent=cachedTimeline.find(x=>x.id===${e.id})?.body||'';this.remove()" style="color:#2563eb;cursor:pointer;font-size:12px">Show more</a>` : ''}
+                    ${e.body.length > 300 ? `<span class="full-body" hidden>${esc(e.body)}</span><a onclick="this.parentElement.querySelector('.comment-body').textContent=this.previousElementSibling.textContent;this.previousElementSibling.remove();this.remove()" style="color:#2563eb;cursor:pointer;font-size:12px">Show more</a>` : ''}
                 </div>`;
         } else {
             const date = fmtDate(e.created_at);
