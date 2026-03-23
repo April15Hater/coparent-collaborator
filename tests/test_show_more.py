@@ -1,12 +1,12 @@
-"""Regression tests for issue #17 — Show more button in topic view.
+"""Regression tests for the Show more button in topic detail view.
 
-The original bug: onclick relied on cachedTimeline.find(x=>x.id===...)
-to look up the full body, but TimelineEntry has no `id` field, so the
-find always returned undefined, emptying the text body instead of
-expanding it.
+The bug: the onclick handler relied on looking up the full body from
+cachedTimeline by entry id, but TimelineEntry has no id field — so
+the lookup always returned undefined, setting textContent to empty.
 
-The fix: store the full body in a hidden <span class="full-body"> sibling
-so the onclick reads it directly from the DOM — no ID lookup needed.
+The fix: encode the full body in a data-full attribute on the
+comment-body div using encodeURIComponent. The onclick reads it
+directly — no lookups, no hidden elements, no sibling traversal.
 """
 
 import re
@@ -23,12 +23,20 @@ def test_show_more_onclick_present():
     assert "Show more" in content, "Show more link has been removed from the template"
 
 
-def test_show_more_uses_hidden_full_body():
-    """The Show more approach should store full body in a hidden span."""
+def test_show_more_uses_data_attribute():
+    """The full body must be stored in a data-full attribute."""
     content = TEMPLATE_PATH.read_text()
-    assert 'class="full-body"' in content, (
-        "Expected a hidden span with class 'full-body' to store the "
-        "complete comment body for the Show more handler"
+    assert "data-full" in content, (
+        "Expected a data-full attribute on comment-body to store "
+        "the full comment body for the Show more handler"
+    )
+    assert "encodeURIComponent" in content, (
+        "Expected encodeURIComponent to safely encode the body "
+        "for the data-full attribute"
+    )
+    assert "decodeURIComponent" in content, (
+        "Expected decodeURIComponent in the onclick to decode "
+        "the body from the data-full attribute"
     )
 
 
@@ -42,8 +50,7 @@ def test_show_more_does_not_use_id_lookup():
     bad_pattern = re.compile(r"cachedTimeline\.find.*?\.id")
     assert not bad_pattern.search(content), (
         "Found cachedTimeline.find by id in Show more handler — "
-        "TimelineEntry has no id field so this always fails. "
-        "Use the hidden full-body span instead."
+        "TimelineEntry has no id field so this always fails."
     )
 
 
@@ -51,9 +58,8 @@ def test_show_more_does_not_use_id_lookup():
 async def test_timeline_returns_long_comment_body(client_a):
     """Long comment bodies must be fully returned by the timeline API.
 
-    This validates the server-side data that feeds the Show more feature —
-    the API must return the full body so the template can render it into
-    the hidden span for expansion.
+    The API must return the full body so the template can encode it
+    into the data-full attribute for expansion.
     """
     # Create an issue
     resp = await client_a.post("/api/issues", json={
